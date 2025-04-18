@@ -1,56 +1,83 @@
+/* Google Font import (alternatif yöntem) */
+/* @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap'); */
+
 body {
   margin: 0;
-  padding: 0; /* Padding'i media query içine taşıyalım */
-  display: flex;
-  flex-direction: column; /* Ana eksen dikey */
-  justify-content: center; /* Dikeyde ortala (min-height ile çalışır) */
-  align-items: center; /* Yatayda ortala */
+  padding: 20px; /* Kenarlarda genel boşluk */
+  display: flex; /* İçeriği ortalamak için */
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  background-color: #f0f0f0;
-  font-family: sans-serif;
+  /* Arka Plan Gradient Eklendi */
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  /* Font Ailesi Ayarlandı */
+  font-family: 'Nunito', sans-serif;
   box-sizing: border-box;
-  overflow-x: hidden; /* Yatay taşmayı engelle */
+  overflow-x: hidden;
 }
 
-/* Canvas'ı ve diğer ana elemanları sarmalayan genel bir container eklemek iyi olabilir */
-/* Şimdilik doğrudan body üzerinde çalışıyoruz */
+/* Ana İçerik Kapsayıcısı Stili */
+.main-container {
+  background-color: #ffffff; /* Beyaz arka plan */
+  padding: 20px;
+  border-radius: 15px; /* Yuvarlak köşeler */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Daha belirgin gölge */
+  width: 100%; /* Genişliği doldur */
+  max-width: 900px; /* Maksimum genişlik (PC için) */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* İçerikleri ortala */
+  box-sizing: border-box;
+}
+
 
 #gameCanvas {
-  border: 2px solid #000;
+  /* border: 2px solid #000; - Kenarlık yerine gölge */
+  border: none; /* Eski kenarlığı kaldır */
   display: none; /* Başlangıçta gizli */
-  margin-top: 15px; /* Üstten biraz boşluk */
-  margin-bottom: 15px; /* Alttan biraz boşluk */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Hafif gölge */
+  margin-top: 20px;
+  margin-bottom: 20px;
+  /* Gölge ve Yuvarlak Köşe Eklendi */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border-radius: 10px; /* Canvas köşelerini yuvarlat */
+  overflow: hidden; /* İçerik taşmasın (gerçi canvas kendi sınırları var) */
 }
 
 #startScreen {
-  display: flex; /* İçerikleri flex ile dizmek için */
-  flex-direction: column; /* Başlangıçta dikey diz */
-  align-items: center; /* Ortala */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 20px;
-  max-width: 90%; /* Genişliğin %90'ını geçmesin */
+  padding: 30px; /* İç boşluk artırıldı */
+  max-width: 95%;
   box-sizing: border-box;
+  /* Başlangıç ekranına da hafif stil verelim */
+  background-color: #f8f9fa; /* Çok hafif gri arka plan */
+  border-radius: 10px;
+  margin-bottom: 20px; /* Alt boşluk */
 }
 
-#startScreen img {
-  margin: 10px 5px; /* Logolar arası boşluk */
-  width: 100px;
-  vertical-align: middle;
-}
-/* Logo çiftini yan yana koymak için bir div içine alabiliriz */
-#logoContainer { /* HTML'e eklenmeli: <div id="logoContainer"><img.../><img.../></div> */
+/* Logo Konteyneri */
+#logoContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Küçük ekranda alt alta insin */
+    flex-wrap: wrap;
+    margin-bottom: 15px; /* Altındaki başlıkla arasına boşluk */
+}
+
+#startScreen img {
+  margin: 5px 15px; /* Logolar arası boşluk */
+  width: 90px; /* Biraz küçülttüm */
+  vertical-align: middle;
 }
 
 
 #startButton, #restartButton, #message {
-  margin-top: 20px;
-  padding: 12px 25px;
-  font-size: 18px;
+  margin-top: 25px; /* Boşluk artırıldı */
+  padding: 13px 30px; /* Boyut artırıldı */
+  font-size: 1.1em; /* Font boyutu */
+  font-weight: 700; /* Kalın font */
 }
 
 #startButton, #restartButton {
@@ -58,72 +85,73 @@ body {
   background-color: #ff6200;
   color: white;
   border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px; /* Daha yuvarlak köşeler */
+  transition: background-color 0.3s ease, transform 0.1s ease; /* Geçiş efekti */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 #startButton:hover, #restartButton:hover {
     background-color: #e65a00;
+    transform: translateY(-1px); /* Hafif yukarı kalkma efekti */
 }
+#startButton:active, #restartButton:active {
+    transform: translateY(1px); /* Basılma efekti */
+    box-shadow: none;
+}
+
 
 #restartButton {
   display: none;
 }
 
 #message {
-  color: red;
+  color: #dc3545; /* Daha standart bir kırmızı tonu */
   display: none;
-  font-weight: bold;
+  font-weight: 700;
+  margin-top: 15px;
 }
 
 h2 {
-  color: #333;
-  font-size: 2em;
-  margin-bottom: 0.5em; /* Alt boşluk */
+  color: #343a40; /* Daha koyu gri */
+  font-size: 2.2em;
+  margin-bottom: 0.6em;
+  font-weight: 700;
 }
 
 p {
-  color: #555;
-  line-height: 1.5;
-  font-size: 1em;
-  margin-top: 0.5em; /* Üst boşluk */
+  color: #495057; /* Biraz daha koyu gri */
+  line-height: 1.6;
+  font-size: 1.05em;
+  margin-top: 0.6em;
+}
+p strong {
+    color: #ff6200; /* Vurgu rengi */
 }
 
 /* --- Mobil İyileştirmeleri (Media Query) --- */
-/* 768px ve altı (Tablet dikey ve telefonlar) */
 @media (max-width: 768px) {
-
   body {
-     padding: 15px; /* Kenar boşlukları */
+     padding: 10px; /* Mobil için padding azalt */
+  }
+  .main-container {
+      padding: 15px;
+      /* max-width: 95%; */ /* Zaten %100 */
   }
 
-  #startScreen img {
-      width: 80px; /* Logolar */
+  #startScreen {
+      padding: 20px;
   }
-
-  h2 { font-size: 1.6em; margin-bottom: 0.4em;}
-  p { font-size: 0.95em; margin-top: 0.4em;}
-
-  #startButton, #restartButton {
-      font-size: 1em;
-      padding: 10px 20px;
-  }
-
-  #message {
-      font-size: 0.9em;
-  }
-
-  /* Dikey modda oyun sonrası butonlar canvas altına daha yakın olabilir */
-  #restartButton, #message {
-      margin-top: 15px;
-  }
+  #startScreen img { width: 75px; }
+  h2 { font-size: 1.8em; }
+  p { font-size: 1em; }
+  #startButton, #restartButton { font-size: 1em; padding: 12px 25px; }
+  #message { font-size: 0.9em; }
 }
 
-/* 480px ve altı (Telefonlar) */
 @media (max-width: 480px) {
-   h2 { font-size: 1.4em; }
+   h2 { font-size: 1.5em; }
    p { font-size: 0.9em; }
-   #startButton, #restartButton { font-size: 0.9em; padding: 10px 18px; } /* Butonları biraz daha küçült */
+   #startButton, #restartButton { font-size: 0.95em; padding: 10px 20px; }
    #message { font-size: 0.85em; }
-   #startScreen img { width: 70px; } /* Logolar */
+   #startScreen img { width: 65px; }
 }
