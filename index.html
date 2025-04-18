@@ -47,11 +47,13 @@ function checkLives() {
     localStorage.setItem('lives', 3);
     return 3;
   }
+  console.log('Stored lives:', storedLives);
   return storedLives;
 }
 
 function updateLives() {
   lives = checkLives();
+  console.log('Current lives:', lives);
   if (lives <= 0) {
     gameOver = true;
     document.getElementById('message').style.display = 'block';
@@ -65,6 +67,7 @@ function preload() {
   try {
     trendyolLogo = loadImage('images.jpg');
     kyrosilLogo = loadImage('cropped-adsiz_tasarim-removebg-preview-1.png');
+    console.log('Logolar yüklendi');
   } catch (e) {
     console.error('Logo yükleme hatası:', e);
     trendyolLogo = null;
@@ -81,10 +84,13 @@ function setup() {
   misses = 0;
   giftMessage = '';
   gameOver = false;
+  gameState = 'playing';
   document.getElementById('restartButton').style.display = 'none';
   document.getElementById('message').style.display = 'none';
   document.getElementById('gameCanvas').style.display = 'block';
+  document.getElementById('startScreen').style.display = 'none';
   updateLives();
+  console.log('Setup tamamlandı, oyun başlıyor');
 }
 
 function draw() {
@@ -94,25 +100,24 @@ function draw() {
     document.getElementById('startScreen').style.display = 'block';
     document.getElementById('gameCanvas').style.display = 'none';
     noLoop();
+    console.log('Başlama ekranı gösteriliyor');
     return;
   }
-
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameCanvas').style.display = 'block';
 
   if (gameOver) {
     fill(255, 0, 0);
     textSize(40);
     textAlign(CENTER);
+    text('Game Over! Puan: ' + score, width / 2, height / 2);
     if (lives > 0) {
-      text('Game Over! Puan: ' + score, width / 2, height / 2);
       document.getElementById('restartButton').style.display = 'block';
     } else {
-      text('Hakların Bitti! Yarın Tekrar Dene!', width / 2, height / 2);
       document.getElementById('message').style.display = 'block';
       document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
+      document.getElementById('restartButton').style.display = 'none';
     }
     noLoop();
+    console.log('Oyun bitti, puan:', score, 'Haklar:', lives);
     return;
   }
 
@@ -133,6 +138,7 @@ function draw() {
       speed: random(4, 8),
       isBonus: isBonus
     });
+    console.log('Yeni kargo eklendi, bonus:', isBonus);
   }
 
   for (let i = kargolar.length - 1; i >= 0; i--) {
@@ -156,7 +162,7 @@ function draw() {
     ) {
       score += kargo.isBonus ? 5 : 1;
       kargolar.splice(i, 1);
-
+      console.log('Kargo yakalandı, puan:', score);
       if (score >= 50) {
         giftMessage = 'Tebrikler! 50 TL Trendyol Hediye Çeki Kazandın!';
       }
@@ -165,6 +171,7 @@ function draw() {
     if (kargo.y > height) {
       kargolar.splice(i, 1);
       misses += 1;
+      console.log('Kargo kaçırıldı, kaçırılan:', misses);
       if (misses >= 3) {
         gameOver = true;
         lives -= 1;
@@ -193,9 +200,11 @@ function startGame() {
     gameState = 'playing';
     setup();
     loop();
+    console.log('Oyun başlatıldı, haklar:', lives);
   } else {
     document.getElementById('message').style.display = 'block';
     document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
+    console.log('Haklar bitti, oyun başlatılamadı');
   }
 }
 
@@ -205,6 +214,9 @@ function restartGame() {
     localStorage.setItem('lives', lives);
     setup();
     loop();
+    console.log('Oyun yeniden başlatıldı, kalan haklar:', lives);
+  } else {
+    console.log('Yeniden başlatılamadı, haklar bitti');
   }
 }
 </script>
