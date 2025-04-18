@@ -1,37 +1,50 @@
 /* Google Font import */
-body { margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); font-family: 'Nunito', sans-serif; box-sizing: border-box; overflow-x: hidden; }
-.main-container { background-color: #ffffff; padding: 20px 15px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; position: relative; }
-#lang-selector { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; z-index: 1000; }
-.lang-button { padding: 5px 10px; font-size: 0.8em; font-weight: 700; border: 1px solid #ddd; background-color: #f0f0f0; color: #555; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
-.lang-button:hover { background-color: #e0e0e0; border-color: #ccc; }
-.lang-button.active { background-color: #ff6200; color: white; border-color: #ff6200; cursor: default; }
-#gameCanvas { border: none; display: none; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); border-radius: 10px; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-#startScreen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px 10px; width: 100%; max-width: 600px; box-sizing: border-box; background-color: #f8f9fa; border-radius: 10px; margin-top: 40px; margin-bottom: 20px; }
-#logoContainer { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-#startScreen img { margin: 5px 10px; width: 80px; vertical-align: middle; }
-#infoSection { margin: 15px 0; padding: 15px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; width: 90%; box-sizing: border-box; }
-#rewardTitle { margin-top: 0; margin-bottom: 10px; font-size: 1.2em; font-weight: 700; color: #333; }
-#rewardList { list-style: none; padding: 0; margin: 0 0 10px 0; font-size: 0.95em; color: #555; }
-#rewardList li { margin-bottom: 5px; }
-#rewardList strong { color: #000; display: inline-block; min-width: 70px; text-align: right; margin-right: 5px; }
+body { margin: 0; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #f0f3f7 0%, #e4e9ef 100%); font-family: 'Nunito', sans-serif; box-sizing: border-box; overflow-x: hidden; }
+.main-container { background-color: #ffffff; padding: 25px 20px; border-radius: 18px; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07); width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; position: relative; border: 1px solid #e9ecef; }
+#lang-selector { position: absolute; top: 18px; right: 18px; display: flex; gap: 6px; z-index: 1000; }
+.lang-button { padding: 6px 11px; font-size: 0.8em; font-weight: 700; border: 1px solid #dee2e6; background-color: #f8f9fa; color: #495057; border-radius: 6px; cursor: pointer; transition: all 0.2s ease-in-out; }
+.lang-button:hover { background-color: #e9ecef; border-color: #ced4da; transform: translateY(-1px); }
+.lang-button.active { background-color: #ff6200; color: white; border-color: #ff6200; cursor: default; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+#gameCanvas { border: none; display: none; margin-top: 15px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); border-radius: 12px; overflow: hidden; touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#startScreen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 25px 15px; width: 100%; max-width: 650px; box-sizing: border-box; background-color: #ffffff; border: none; border-radius: 12px; margin-top: 45px; margin-bottom: 25px; }
+#logoContainer { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+#startScreen img { margin: 5px 12px; width: 85px; vertical-align: middle; }
+.slogan-text { font-size: 1.1em; font-style: italic; color: #ff6200; margin: 5px 0 20px 0; max-width: 85%; }
+#infoSection { margin: 20px 0; padding: 20px; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; width: 95%; box-sizing: border-box; }
+#rewardTitle { margin-top: 0; margin-bottom: 15px; font-size: 1.3em; font-weight: 700; color: #343a40; }
+#rewardList { list-style: none; padding: 0; margin: 0 0 15px 0; font-size: 1em; color: #495057; }
+#rewardList li { margin-bottom: 7px; }
+#rewardList strong { color: #212529; display: inline-block; min-width: 80px; text-align: right; margin-right: 10px; }
 #rewardList span { color: #ff6200; font-weight: 700; }
-#pointInfo { font-size: 0.9em; color: #666; margin: 10px 0 0 0; }
-.important-note { font-size: 0.85em; color: #dc3545; font-weight: 700; margin-top: 10px; border: 1px solid #f5c6cb; background-color: #f8d7da; padding: 8px; border-radius: 5px; }
-#howToPlay { font-size: 0.9em; color: #6c757d; margin-top: 15px; }
-#emailSection { margin: 20px 0; width: 90%; }
-#emailLabel { display: block; margin-bottom: 8px; font-size: 0.95em; font-weight: 700; color: #555; }
-#emailInput { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; font-size: 1em; box-sizing: border-box; }
-#emailInput:focus { border-color: #ff9933; outline: none; box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.2); }
-.error-message { color: #dc3545; font-size: 0.85em; margin-top: 5px; display: none; }
-#startButton, #restartButton { margin-top: 10px; padding: 12px 28px; font-size: 1.05em; font-weight: 700; cursor: pointer; background-color: #ff6200; color: white; border: none; border-radius: 8px; transition: background-color 0.3s ease, transform 0.1s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-#startButton:hover, #restartButton:hover { background-color: #e65a00; transform: translateY(-1px); }
-#startButton:active, #restartButton:active { transform: translateY(1px); box-shadow: none; }
-#restartButton { display: none; }
-#message { color: #dc3545; display: none; font-weight: 700; margin-top: 15px; text-align: center; width: 90%; padding: 10px; box-sizing: border-box; border-radius: 8px; /* Genel mesajlar için de */ }
-#message.winMessage { color: #155724 !important; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; font-size: 1em; font-weight: normal; line-height: 1.6; }
-#message.winMessage strong { color: #000 !important; }
-h2#game-title { color: #343a40; font-size: 2em; margin-bottom: 0.5em; font-weight: 700; }
-p { color: #495057; line-height: 1.6; font-size: 1em; margin-top: 0.6em; }
+#pointInfo { font-size: 0.95em; color: #495057; margin: 10px 0 0 0; }
+/* <<<--- GO Bilgisi Stili Eklendi ---> */
+.go-info-text {
+    font-size: 0.85em;
+    color: #6c757d; /* Biraz daha soluk */
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #e9ecef; /* Hafif farklı arka plan */
+    border-radius: 4px;
+    display: inline-block; /* İçeriğe göre genişlesin */
+}
+.important-note { font-size: 0.9em; color: #856404; font-weight: 700; margin-top: 15px; border: 1px solid #fff3cd; background-color: #fff9e1; padding: 12px; border-radius: 8px; }
+#howToPlay { font-size: 1em; color: #495057; margin-top: 20px; }
+#emailSection { margin: 25px 0; width: 90%; max-width: 400px; }
+#emailLabel { display: block; margin-bottom: 10px; font-size: 1em; font-weight: 700; color: #343a40; }
+#emailInput { width: 100%; padding: 12px 15px; border: 1px solid #ced4da; border-radius: 8px; font-size: 1em; box-sizing: border-box; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+#emailInput:focus { border-color: #fda M533; outline: none; box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.15); }
+.error-message { color: #dc3545; font-size: 0.9em; margin-top: 8px; display: none; }
+#startButton, #restartButton { margin-top: 15px; padding: 14px 35px; font-size: 1.15em; font-weight: 700; cursor: pointer; background-color: #ff6200; color: white; border: none; border-radius: 10px; transition: background-color 0.2s ease, transform 0.1s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+#startButton:hover, #restartButton:hover { background-color: #f05a00; transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.15); }
+#startButton:active, #restartButton:active { transform: translateY(0px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+#restartButton { display: none; background-color: #6c757d; }
+#restartButton:hover { background-color: #5a6268; }
+#message { color: #dc3545; display: none; font-weight: 700; margin-top: 20px; text-align: center; width: 90%; max-width: 600px; padding: 15px; box-sizing: border-box; border-radius: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb;}
+#message.winMessage { color: #0f5132 !important; background-color: #d1e7dd; border: 1px solid #badbcc; padding: 20px; font-size: 1.1em; line-height: 1.7; }
+#message.winMessage strong { color: #0a3622 !important; }
+h2#game-title { color: #212529; font-size: 2.2em; margin-bottom: 0.6em; font-weight: 700; }
+p { color: #495057; line-height: 1.6; font-size: 1em; margin-top: 0.8em; }
 p strong { color: #ff6200; }
-@media (max-width: 768px) { body { padding: 10px; } .main-container { padding: 10px; max-width: 100%; } #lang-selector { top: 10px; right: 10px; } .lang-button { padding: 7px 12px; } #startScreen { margin-top: 50px; padding: 15px 5px; } #startScreen img { width: 70px; } h2#game-title { font-size: 1.7em; } p { font-size: 0.95em; } #infoSection { width: 95%; padding: 10px; } #rewardTitle { font-size: 1.1em; } #rewardList { font-size: 0.9em; } #rewardList strong { min-width: 50px; } #pointInfo { font-size: 0.85em; } .important-note { font-size: 0.8em; padding: 6px;} #emailSection { width: 95%; } #emailLabel { font-size: 0.9em; } #emailInput { font-size: 0.95em; padding: 8px; } #startButton, #restartButton { font-size: 1em; padding: 10px 20px; } #message { font-size: 0.9em; width: 95%; padding: 10px; } }
-@media (max-width: 480px) { #lang-selector { top: 8px; right: 8px; } .lang-button { padding: 6px 10px; } h2#game-title { font-size: 1.4em; } p { font-size: 0.85em; } #startButton, #restartButton { font-size: 0.9em; padding: 9px 18px; } #message { font-size: 0.85em; padding: 8px; } #startScreen img { width: 60px; } #infoSection { width: 98%; padding: 8px;} #rewardTitle { font-size: 1em; } #rewardList { font-size: 0.8em; } #pointInfo { font-size: 0.8em; } .important-note { font-size: 0.75em;} #emailLabel { font-size: 0.85em; } }
+/* --- Mobil İyileştirmeleri --- */
+@media (max-width: 768px) { body { padding: 10px; } .main-container { padding: 15px 10px; } #lang-selector { top: 10px; right: 10px; } .lang-button { padding: 7px 12px; } #startScreen { margin-top: 50px; padding: 20px 10px; } #startScreen img { width: 75px; } h2#game-title { font-size: 1.9em; } p { font-size: 1em; } .slogan-text { font-size: 1.05em;} #infoSection { width: 95%; padding: 15px; } #rewardTitle { font-size: 1.2em; } #rewardList { font-size: 0.95em; } #rewardList strong { min-width: 65px; } #pointInfo { font-size: 0.95em; } .go-info-text { font-size: 0.8em; margin-top: 8px;} .important-note { font-size: 0.85em; padding: 10px;} #emailSection { width: 95%; margin: 20px 0;} #emailLabel { font-size: 1em; } #emailInput { font-size: 1em; padding: 12px; } #startButton, #restartButton { font-size: 1.1em; padding: 12px 25px; } #message { font-size: 1em; width: 95%; padding: 12px; } #message.winMessage { font-size: 1.05em; padding: 15px;} }
+@media (max-width: 480px) { #lang-selector { top: 8px; right: 8px; } .lang-button { padding: 6px 10px; } h2#game-title { font-size: 1.6em; } p { font-size: 0.9em; } .slogan-text { font-size: 1em;} #startButton, #restartButton { font-size: 1em; padding: 11px 22px; } #message { font-size: 0.9em; } #message.winMessage { font-size: 1em; } #startScreen img { width: 70px; } #infoSection { width: 98%; padding: 12px;} #rewardTitle { font-size: 1.1em; } #rewardList { font-size: 0.9em; } #pointInfo { font-size: 0.9em; } .go-info-text { font-size: 0.75em;} .important-note { font-size: 0.8em;} #emailLabel { font-size: 0.95em; } }
