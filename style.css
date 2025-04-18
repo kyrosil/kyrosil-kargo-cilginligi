@@ -1,33 +1,51 @@
 body {
   margin: 0;
+  padding: 0; /* Padding'i media query içine taşıyalım */
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* min-height kullanmak daha iyi olabilir */
+  flex-direction: column; /* Ana eksen dikey */
+  justify-content: center; /* Dikeyde ortala (min-height ile çalışır) */
+  align-items: center; /* Yatayda ortala */
+  min-height: 100vh;
   background-color: #f0f0f0;
   font-family: sans-serif;
-  box-sizing: border-box; /* Padding hesaplamalarını kolaylaştırır */
+  box-sizing: border-box;
+  overflow-x: hidden; /* Yatay taşmayı engelle */
 }
+
+/* Canvas'ı ve diğer ana elemanları sarmalayan genel bir container eklemek iyi olabilir */
+/* Şimdilik doğrudan body üzerinde çalışıyoruz */
 
 #gameCanvas {
   border: 2px solid #000;
-  display: none;
-  /* max-width: 100%; */ /* Canvas'ın kendisi JS ile ayarlandığı için bu genellikle işe yaramaz */
-  /* height: auto; */    /* Aynı şekilde */
+  display: none; /* Başlangıçta gizli */
+  margin-top: 15px; /* Üstten biraz boşluk */
+  margin-bottom: 15px; /* Alttan biraz boşluk */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Hafif gölge */
 }
 
 #startScreen {
+  display: flex; /* İçerikleri flex ile dizmek için */
+  flex-direction: column; /* Başlangıçta dikey diz */
+  align-items: center; /* Ortala */
   text-align: center;
   padding: 20px;
-  max-width: 90%; /* Mobil için içeriğin taşmasını önle */
+  max-width: 90%; /* Genişliğin %90'ını geçmesin */
+  box-sizing: border-box;
 }
 
 #startScreen img {
-  margin: 10px;
+  margin: 10px 5px; /* Logolar arası boşluk */
   width: 100px;
   vertical-align: middle;
 }
+/* Logo çiftini yan yana koymak için bir div içine alabiliriz */
+#logoContainer { /* HTML'e eklenmeli: <div id="logoContainer"><img.../><img.../></div> */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Küçük ekranda alt alta insin */
+}
+
 
 #startButton, #restartButton, #message {
   margin-top: 20px;
@@ -60,63 +78,52 @@ body {
 
 h2 {
   color: #333;
-  font-size: 2em; /* Başlık boyutu */
+  font-size: 2em;
+  margin-bottom: 0.5em; /* Alt boşluk */
 }
 
 p {
   color: #555;
   line-height: 1.5;
-  font-size: 1em; /* Paragraf boyutu */
+  font-size: 1em;
+  margin-top: 0.5em; /* Üst boşluk */
 }
 
 /* --- Mobil İyileştirmeleri (Media Query) --- */
-@media (max-width: 820px) { /* Geniş tablet ve altı */
+/* 768px ve altı (Tablet dikey ve telefonlar) */
+@media (max-width: 768px) {
 
   body {
-     /* min-height unset yapıp normal akışa bırakılabilir veya %100 */
      padding: 15px; /* Kenar boşlukları */
   }
 
   #startScreen img {
-      width: 80px; /* Logoları biraz küçült */
+      width: 80px; /* Logolar */
   }
 
-  h2 { font-size: 1.6em; } /* Başlığı küçült */
-  p { font-size: 0.95em; } /* Paragrafları küçült */
+  h2 { font-size: 1.6em; margin-bottom: 0.4em;}
+  p { font-size: 0.95em; margin-top: 0.4em;}
 
   #startButton, #restartButton {
-      font-size: 1em; /* Buton yazısını küçült */
-      padding: 10px 20px; /* Buton boyutunu küçült */
+      font-size: 1em;
+      padding: 10px 20px;
   }
 
   #message {
-      font-size: 0.9em; /* Mesaj yazısını küçült */
+      font-size: 0.9em;
   }
 
-  /* Canvas'ı küçültme (Basit Ölçekleme - Kalite düşebilir) */
-  /* İstersen bu kısmı açıp deneyebilirsin ama JS ile yapmak daha iyi */
-  /*
-  #gameCanvas {
-      transform: scale(0.8); // Canvas'ı %80 küçültür
-      transform-origin: top center; // Küçültme merkezini ayarla
-      margin-bottom: -120px; // scale küçültünce boşluk kalmasın diye (600 * (1-0.8) = 120)
+  /* Dikey modda oyun sonrası butonlar canvas altına daha yakın olabilir */
+  #restartButton, #message {
+      margin-top: 15px;
   }
-  */
 }
 
-@media (max-width: 480px) { /* Telefonlar */
+/* 480px ve altı (Telefonlar) */
+@media (max-width: 480px) {
    h2 { font-size: 1.4em; }
    p { font-size: 0.9em; }
-   #startButton, #restartButton { font-size: 0.9em; padding: 8px 15px; }
+   #startButton, #restartButton { font-size: 0.9em; padding: 10px 18px; } /* Butonları biraz daha küçült */
    #message { font-size: 0.85em; }
-   #startScreen img { width: 60px; } /* Logoları daha da küçült */
-
-   /* Canvas için scale daha da artırılabilir */
-   /*
-   #gameCanvas {
-       transform: scale(0.6);
-       transform-origin: top center;
-       margin-bottom: -240px; // (600 * (1-0.6) = 240)
-   }
-   */
+   #startScreen img { width: 70px; } /* Logolar */
 }
