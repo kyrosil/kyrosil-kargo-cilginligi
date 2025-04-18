@@ -29,7 +29,6 @@ function playSound(soundFile, volume = 0.5, rate = 1, pan = 0) { if (getAudioCon
 
 // --- p5.js Özel Fonksiyonları ---
 function preload() { /* ... öncekiyle aynı ... */ }
-
 function setup() {
     // ... (Canvas oluşturma, gleen, havuz oluşturma - öncekiyle aynı) ...
      let canvasW, canvasH; let w = windowWidth; let h = windowHeight; if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; } else { isVertical = false; canvasW = 800; canvasH = 600; } gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas'); let gleenY = canvasH - (isVertical ? 40 : 60); gleen = { x: canvasW / 2 - playerWidth / 2, y: gleenY, w: playerWidth, h: playerHeight }; kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); }
@@ -37,49 +36,59 @@ function setup() {
     lives = checkLives();
     console.log('Kurulum Bitti. Mod:', isVertical ? 'Dikey' : 'Yatay', 'Boyut:', round(canvasW), 'x', round(canvasH), 'Haklar:', lives, '(localStorage DEVRE DIŞI)');
 
-    // <<<--- Dil butonlarına event listener ('click' olarak GERİ DÖNDÜ) ---
+    // Dil butonlarına olay dinleyici ('click' kullanılıyor)
     const langTRButton = document.getElementById('lang-tr');
     const langENButton = document.getElementById('lang-en');
 
     if (langTRButton) {
-        langTRButton.addEventListener('click', () => { // <<<--- 'touchstart' yerine 'click'
+        langTRButton.addEventListener('click', () => { // <<<--- 'click' kullanılıyor
             console.log("[Event] TR button CLICKED.");
             playSound(clickSound);
-            if (currentLang !== 'TR') {
-                currentLang = 'TR';
-                updateTexts(currentLang);
-            }
+            if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); }
         });
          console.log("[setup] TR Buton Listener Eklendi (click).");
     } else { console.error("[setup] TR Dil butonu bulunamadı!"); }
 
     if (langENButton) {
-        langENButton.addEventListener('click', () => { // <<<--- 'touchstart' yerine 'click'
+        langENButton.addEventListener('click', () => { // <<<--- 'click' kullanılıyor
             console.log("[Event] EN button CLICKED.");
             playSound(clickSound);
-            if (currentLang !== 'EN') {
-                currentLang = 'EN';
-                updateTexts(currentLang);
-            }
+            if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); }
         });
          console.log("[setup] EN Buton Listener Eklendi (click).");
      } else { console.error("[setup] EN Dil butonu bulunamadı!"); }
-    // --- Event Listener Geri Alma Bitti ---
 
-    updateTexts(currentLang); // Başlangıç metinleri
+    updateTexts(currentLang);
     gameInstanceCanvas.style('pointer-events', 'auto');
     noLoop();
     console.log("[setup] Kurulum Tamamlandı.");
 }
 
-function draw() { /* ... (öncekiyle aynı - #47'deki gibi, kazanma mesajı canvas'ta) ... */
-     background(canvasBackgroundColor); if (gameOver) { const reward = getReward(finalScore, currentLang); const t = texts[currentLang]; const messageEl = document.getElementById('message'); const restartButtonEl = document.getElementById('restartButton'); messageEl.style.display = 'none'; messageEl.className = ''; restartButtonEl.style.display = 'none'; if (reward && reward.amount) { fill(0, 0, 0, 150); rect(0, 0, width, height); let boxW = width * 0.8; let boxH = height * 0.6; let boxX = (width - boxW) / 2; let boxY = (height - boxH) / 2; stroke(200); fill(250); rect(boxX, boxY, boxW, boxH, 10); textAlign(CENTER, CENTER); textSize(isVertical ? 20 : 28); fill('#155724'); let messageText = `${t.winMessagePart1}${finalScore}${t.winMessagePart2}${reward.amount}${t.winMessagePart3}`; text(messageText, boxX + 20, boxY + 20, boxW - 40, boxH * 0.5 - 30); textSize(isVertical ? 12 : 14); fill(80); text(t.winInstructions, boxX + 20, boxY + boxH * 0.5 , boxW - 40, boxH * 0.5 - 30); if (!confettiFired) { playSound(winSound, 0.6); triggerConfetti(); confettiFired = true; } } else { messageEl.innerText = `${t.gameOverBase}\n${t.scoreLabel}${finalScore}`; messageEl.style.color = '#dc3545'; messageEl.style.display = 'block'; } if (lives <= 0) { let noLivesText = `<br><br><strong style="color: red; font-size: 1.1em;">${t.noMoreLives}</strong>`; if (!messageEl.innerHTML.includes(t.noMoreLives)) { messageEl.innerHTML += noLivesText; } messageEl.style.display = 'block'; } if (lives > 0) { restartButtonEl.style.display = 'block'; } if (gameInstanceCanvas) { gameInstanceCanvas.style('pointer-events', 'none'); } noLoop(); return; } fill(playerColor); noStroke(); rect(gleen.x, gleen.y, gleen.w, gleen.h, 5); gleen.x = constrain(mouseX - gleen.w / 2, 0, width - gleen.w); let spawnRate = 50; let minSpeed = 3; let maxSpeed = 7; if (score >= 50) { spawnRate = 35; minSpeed = 6; maxSpeed = 14; } else if (score >= 30) { spawnRate = 40; minSpeed = 5; maxSpeed = 12; } else if (score >= 15) { spawnRate = 45; minSpeed = 4; maxSpeed = 9; } if (frameCount % spawnRate === 0 && lives > 0) { spawnKargoFromPool(minSpeed, maxSpeed); } for (let i = 0; i < kargoPool.length; i++) { let kargo = kargoPool[i]; if (!kargo.active) { continue; } let speedMultiplier = deltaTime / (1000 / 60); if (isNaN(speedMultiplier) || speedMultiplier <= 0 || speedMultiplier > 5) { speedMultiplier = 1; } kargo.y += kargo.speed * speedMultiplier; push(); translate(kargo.x + kargo.w / 2, kargo.y + kargo.h / 2); imageMode(CENTER); if (kargo.isBonus && kyrosilLogo) { image(kyrosilLogo, 0, 0, kargo.w, kargo.h); } else if (!kargo.isBonus && trendyolLogo) { image(trendyolLogo, 0, 0, kargo.w, kargo.h); } else { rectMode(CENTER); fill(kargo.isBonus ? color(255, 215, 0) : color(139, 69, 19)); rect(0, 0, kargo.w * 0.8, kargo.h * 0.8); } pop(); if ( gleen.x < kargo.x + kargo.w && gleen.x + gleen.w > kargo.x && gleen.y < kargo.y + kargo.h && gleen.y + gleen.h > kargo.y ) { score += kargo.isBonus ? 5 : 1; kargo.active = false; playSound(catchSound, 0.7); } else if (kargo.y > height + kargo.h) { let wasBonus = kargo.isBonus; kargo.active = false; if (!wasBonus) { misses += 1; playSound(missSound, 0.6); if (misses >= 3) { finalScore = score; gameOver = true; playSound(gameOverSound, 0.7); } } } } const t = texts[currentLang]; fill(50); textSize( isVertical ? 16 : 18 ); textAlign(LEFT, TOP); let textY = isVertical ? 15 : 20; let textOffset = isVertical ? 25 : 30; text(t.scoreLabel + score, 15, textY); text(t.missedLabel + misses + '/3', 15, textY + textOffset); text(t.livesLabel + lives, 15, textY + textOffset * 2);
- }
+function draw() { /* ... (öncekiyle aynı) ... */ }
 function startGame() { /* ... (öncekiyle aynı) ... */ }
 function restartGame() { /* ... (öncekiyle aynı) ... */ }
 function resetGame() { /* ... (öncekiyle aynı) ... */ }
 
-// --- Dokunma Fonksiyonları (Kaydırma engelleme için) ---
-function touchStarted() { if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) { return false; } }
-function touchMoved() { if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) { return false; } }
-function touchEnded() { }
+// --- Dokunma Fonksiyonları (ŞİMDİLİK DEVRE DIŞI) ---
+/* // <<<--- Bu fonksiyonlar komple yoruma alındı
+function touchStarted() {
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+     // console.log("Canvas içinde dokunma başladı (engellendi).");
+     return false; // Varsayılanı engelle
+  }
+   // console.log("Canvas DIŞINDA dokunma başladı (engellenmedi).");
+}
+
+function touchMoved() {
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+     // console.log("Canvas içinde parmak hareket etti (engellendi).");
+     return false; // Varsayılanı engelle (Kaydırma için en önemlisi)
+  }
+   // console.log("Canvas DIŞINDA parmak hareket etti (engellenmedi).");
+}
+
+function touchEnded() {
+    // console.log("Dokunma bitti.");
+}
+*/ // <<<--- Yorum Bitişi
+// --- DOKUNMA FONKSİYONLARI BİTTİ ---
