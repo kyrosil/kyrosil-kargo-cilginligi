@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
+<html lang="tr"> <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trendyol Kargo Kapmaca</title>
@@ -16,6 +15,11 @@
 
   <div class="main-container">
 
+    <div id="lang-selector">
+      <button id="lang-tr" class="lang-button active">TR</button>
+      <button id="lang-en" class="lang-button">EN</button>
+    </div>
+
     <div id="gameCanvas"></div>
 
     <div id="startScreen">
@@ -23,14 +27,27 @@
         <img src="images.jpg" alt="Trendyol Logo">
         <img src="cropped-adsiz_tasarim-removebg-preview-1.png" alt="Kyrosil Logo">
       </div>
-      <h2>Trendyol Kargo Kapmaca</h2>
-      <p>50 puana ulaş, <strong>50 TL Trendyol Hediye Çeki</strong> kazan!</p>
-      <p>Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
+      <h2 id="game-title">Trendyol Kargo Kapmaca</h2>
+
+      <div id="infoSection">
+          <h3 id="rewardTitle">Ödül Baremleri (TL)</h3>
+          <ul id="rewardList">
+              </ul>
+          <p id="pointInfo">Trendyol Logo: 1 Puan | Kyrosil Logo (Bonus): 5 Puan</p>
+          <p id="europeNote" class="important-note" style="display: none;"></p> </div>
+
+      <p id="howToPlay">Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
+
+      <div id="emailSection">
+          <label for="emailInput" id="emailLabel">Başlamak için E-posta Adresiniz:</label>
+          <input type="email" id="emailInput" placeholder="Trendyol E-posta Adresiniz" required>
+          <div id="emailError" class="error-message" style="display: none;">Lütfen geçerli bir e-posta girin.</div>
+      </div>
+
       <button id="startButton" onclick="startGame()">Başla</button>
     </div>
 
     <div id="message"></div>
-
     <button id="restartButton" onclick="restartGame()">Yeniden Başlat</button>
 
   </div> <script src="script.js"></script>
