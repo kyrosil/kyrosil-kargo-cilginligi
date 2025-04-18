@@ -1,7 +1,7 @@
 // --- Oyun Değişkenleri, Ayarları, Ödüller, Metinler ---
-// ... (Öncekiyle aynı - Değişiklik yok) ...
+// ... (Diğer kısımlar aynı) ...
 let gleen; let kargoPool = []; const MAX_KARGOS = 60; let score = 0; let misses = 0;
-let giftMessage = ''; let gameOver = false; let lives = 3;
+let giftMessage = ''; let gameOver = false; let lives = 3; // Başlangıçta 3 ama checkLives belirleyecek
 let trendyolLogo, kyrosilLogo;
 let gameInstanceCanvas; let isVertical = false; let currentLang = 'TR';
 let confettiInterval; let finalScore = 0;
@@ -12,53 +12,50 @@ const texts = { TR: { gameTitle: "Trendyol Kargo Kapmaca", rewardTitle: "Ödül 
 
 
 // --- Yardımcı Fonksiyonlar ---
-// ... (checkLives, updateStoredLives, updateTexts, getReward, isValidEmail, triggerConfetti - Öncekiyle aynı) ...
-function checkLives() { const today = new Date().toDateString(); const storedDate = localStorage.getItem('gameDate'); const storedLives = localStorage.getItem('lives'); if (storedDate !== today || storedLives === null) { localStorage.setItem('gameDate', today); localStorage.setItem('lives', '3'); return 3; } const currentLives = parseInt(storedLives); return isNaN(currentLives) || currentLives < 0 ? 3 : currentLives; }
-function updateStoredLives(newLives) { lives = newLives >= 0 ? newLives : 0; localStorage.setItem('lives', lives.toString()); console.log('Hak güncellendi (localStorage):', lives); }
-function updateTexts(lang) { const t = texts[lang]; document.getElementById('game-title').innerText = t.gameTitle; document.getElementById('rewardTitle').innerText = t.rewardTitle; document.getElementById('pointInfo').innerText = t.pointInfo; document.getElementById('howToPlay').innerText = t.howToPlay; document.getElementById('emailLabel').innerText = t.emailLabel; document.getElementById('emailInput').placeholder = t.emailPlaceholder; document.getElementById('startButton').innerText = t.startBtn; document.getElementById('restartButton').innerText = t.restartBtn; document.getElementById('emailError').innerText = t.emailError; const rewardListEl = document.getElementById('rewardList'); rewardListEl.innerHTML = ''; rewardTiers[lang].forEach(tier => { if (tier.amount) { const li = document.createElement('li'); li.innerHTML = `<strong>${tier.score} Puan:</strong> <span>${tier.amount}</span>`; rewardListEl.appendChild(li); } }); const europeNoteEl = document.getElementById('europeNote'); if (lang === 'EN' && t.europeNote) { europeNoteEl.innerText = t.europeNote; europeNoteEl.style.display = 'block'; } else { europeNoteEl.style.display = 'none'; } document.getElementById('lang-tr').classList.toggle('active', lang === 'TR'); document.getElementById('lang-en').classList.toggle('active', lang === 'EN'); document.documentElement.lang = lang.toLowerCase(); }
-function getReward(finalScore, lang) { const tiers = rewardTiers[lang]; for (const tier of tiers) { if (finalScore >= tier.score) { return tier.amount ? { amount: tier.amount, score: tier.score } : null; } } return null; }
-function isValidEmail(email) { return email && email.includes('@') && email.includes('.'); }
-function triggerConfetti() { console.log("Konfeti!"); /* Gerçek kod eklenebilir */ }
+function checkLives() {
+    // <<<--- localStorage OKUMA DEVRE DIŞI BIRAKILDI ---
+    // const today = new Date().toDateString();
+    // const storedDate = localStorage.getItem('gameDate');
+    // const storedLives = localStorage.getItem('lives');
+    // if (storedDate !== today || storedLives === null) {
+    //    localStorage.setItem('gameDate', today); // Yazma da devre dışı
+    //    localStorage.setItem('lives', '3');      // Yazma da devre dışı
+    //    console.log("localStorage sıfırlanırdı (devre dışı)");
+    //    return 3;
+    // }
+    // const currentLives = parseInt(storedLives);
+    // return isNaN(currentLives) || currentLives < 0 ? 3 : currentLives;
+    // --- Bitiş ---
 
-// --- Nesne Havuzlama Fonksiyonları ---
-// ... (findInactiveKargo, spawnKargoFromPool - Öncekiyle aynı) ...
-function findInactiveKargo() { for (let i = 0; i < kargoPool.length; i++) { if (!kargoPool[i].active) { return kargoPool[i]; } } return null; }
-function spawnKargoFromPool(minSpeed, maxSpeed) { let kargo = findInactiveKargo(); if (kargo) { let isBonus = random(1) < 0.15; let kargoSize = isBonus ? bonusKargoBoyutu : normalKargoBoyutu; kargo.active = true; kargo.isBonus = isBonus; kargo.w = kargoSize; kargo.h = kargoSize; kargo.x = random(10, width - (kargoSize + 10)); kargo.y = -(kargoSize + 10); kargo.speed = random(minSpeed, maxSpeed); } }
+    // <<<--- Her zaman 3 hak döndür ---
+    console.log("localStorage devre dışı. Haklar 3 olarak ayarlandı.");
+    return 3;
+}
 
+function updateStoredLives(newLives) {
+    lives = newLives >= 0 ? newLives : 0;
+    // <<<--- localStorage YAZMA DEVRE DIŞI BIRAKILDI ---
+    // localStorage.setItem('lives', lives.toString());
+    // console.log('localStorage güncellenirdi (devre dışı). Mevcut hak:', lives);
+}
+
+function updateTexts(lang) { /* ... (öncekiyle aynı) ... */ const t = texts[lang]; document.getElementById('game-title').innerText = t.gameTitle; document.getElementById('rewardTitle').innerText = t.rewardTitle; document.getElementById('pointInfo').innerText = t.pointInfo; document.getElementById('howToPlay').innerText = t.howToPlay; document.getElementById('emailLabel').innerText = t.emailLabel; document.getElementById('emailInput').placeholder = t.emailPlaceholder; document.getElementById('startButton').innerText = t.startBtn; document.getElementById('restartButton').innerText = t.restartBtn; document.getElementById('emailError').innerText = t.emailError; const rewardListEl = document.getElementById('rewardList'); rewardListEl.innerHTML = ''; rewardTiers[lang].forEach(tier => { if (tier.amount) { const li = document.createElement('li'); li.innerHTML = `<strong>${tier.score} Puan:</strong> <span>${tier.amount}</span>`; rewardListEl.appendChild(li); } }); const europeNoteEl = document.getElementById('europeNote'); if (lang === 'EN' && t.europeNote) { europeNoteEl.innerText = t.europeNote; europeNoteEl.style.display = 'block'; } else { europeNoteEl.style.display = 'none'; } document.getElementById('lang-tr').classList.toggle('active', lang === 'TR'); document.getElementById('lang-en').classList.toggle('active', lang === 'EN'); document.documentElement.lang = lang.toLowerCase(); }
+function getReward(finalScore, lang) { /* ... (öncekiyle aynı) ... */ const tiers = rewardTiers[lang]; for (const tier of tiers) { if (finalScore >= tier.score) { return tier.amount ? { amount: tier.amount, score: tier.score } : null; } } return null; }
+function isValidEmail(email) { /* ... (öncekiyle aynı) ... */ return email && email.includes('@') && email.includes('.'); }
+function triggerConfetti() { /* ... (öncekiyle aynı) ... */ console.log("Konfeti!"); }
+function findInactiveKargo() { /* ... (öncekiyle aynı) ... */ for (let i = 0; i < kargoPool.length; i++) { if (!kargoPool[i].active) { return kargoPool[i]; } } return null; }
+function spawnKargoFromPool(minSpeed, maxSpeed) { /* ... (öncekiyle aynı) ... */ let kargo = findInactiveKargo(); if (kargo) { let isBonus = random(1) < 0.15; let kargoSize = isBonus ? bonusKargoBoyutu : normalKargoBoyutu; kargo.active = true; kargo.isBonus = isBonus; kargo.w = kargoSize; kargo.h = kargoSize; kargo.x = random(10, width - (kargoSize + 10)); kargo.y = -(kargoSize + 10); kargo.speed = random(minSpeed, maxSpeed); } }
 
 // --- p5.js Özel Fonksiyonları ---
 function preload() { /* ... (öncekiyle aynı) ... */ try { trendyolLogo = loadImage('images.jpg'); kyrosilLogo = loadImage('cropped-adsiz_tasarim-removebg-preview-1.png'); } catch (e) { console.error('Logo yükleme hatası:', e); trendyolLogo = null; kyrosilLogo = null; } }
+function setup() { /* ... (öncekiyle aynı) ... */ let canvasW, canvasH; let w = windowWidth; let h = windowHeight; if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; } else { isVertical = false; canvasW = 800; canvasH = 600; } gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas'); let gleenWidth = 50; let gleenHeight = 15; let gleenY = canvasH - (isVertical ? 40 : 60); gleen = { x: canvasW / 2 - gleenWidth / 2, y: gleenY, w: gleenWidth, h: gleenHeight }; kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); } lives = checkLives(); console.log('Kurulum Bitti. Mod:', isVertical ? 'Dikey' : 'Yatay', 'Boyut:', round(canvasW), 'x', round(canvasH), 'Haklar:', lives, '(localStorage DEVRE DIŞI)'); document.getElementById('lang-tr').addEventListener('click', () => { if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); } }); document.getElementById('lang-en').addEventListener('click', () => { if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); } }); updateTexts(currentLang); noLoop(); }
+function draw() { /* ... (öncekiyle aynı) ... */ background(canvasBackgroundColor); if (gameOver) { const reward = getReward(finalScore, currentLang); const t = texts[currentLang]; const messageEl = document.getElementById('message'); messageEl.innerHTML = ''; messageEl.className = ''; if (reward && reward.amount) { messageEl.classList.add('winMessage'); messageEl.innerHTML = `<strong>${t.winMessagePart1}${finalScore}${t.winMessagePart2}${reward.amount}${t.winMessagePart3}</strong><br><br>${t.winInstructions}`; if (!confettiInterval) { triggerConfetti(); } } else { messageEl.classList.remove('winMessage'); messageEl.innerText = `${t.gameOverBase} ${finalScore}`; } messageEl.style.display = 'block'; if (lives > 0) { document.getElementById('restartButton').style.display = 'block'; } else { document.getElementById('restartButton').style.display = 'none'; let noLivesEl = document.getElementById('noLivesMessage'); if (!noLivesEl) { messageEl.innerHTML += `<br><br><strong style="color: red;">${t.noMoreLives}</strong>`; } else { noLivesEl.innerText = t.noMoreLives; noLivesEl.style.display = 'block'; } } noLoop(); return; } fill(playerColor); noStroke(); rect(gleen.x, gleen.y, gleen.w, gleen.h, 5); gleen.x = constrain(mouseX - gleen.w / 2, 0, width - gleen.w); let spawnRate = 50; let minSpeed = 3; let maxSpeed = 7; if (score >= 30) { spawnRate = 40; minSpeed = 5; maxSpeed = 11; } else if (score >= 15) { spawnRate = 45; minSpeed = 4; maxSpeed = 9; } if (frameCount % spawnRate === 0 && lives > 0) { spawnKargoFromPool(minSpeed, maxSpeed); } for (let i = 0; i < kargoPool.length; i++) { let kargo = kargoPool[i]; if (!kargo.active) { continue; } let speedMultiplier = deltaTime / (1000 / 60); if (isNaN(speedMultiplier) || speedMultiplier <= 0 || speedMultiplier > 5) { speedMultiplier = 1; } kargo.y += kargo.speed * speedMultiplier; push(); translate(kargo.x + kargo.w / 2, kargo.y + kargo.h / 2); imageMode(CENTER); if (kargo.isBonus && kyrosilLogo) { image(kyrosilLogo, 0, 0, kargo.w, kargo.h); } else if (!kargo.isBonus && trendyolLogo) { image(trendyolLogo, 0, 0, kargo.w, kargo.h); } else { rectMode(CENTER); fill(kargo.isBonus ? color(255, 215, 0) : color(139, 69, 19)); rect(0, 0, kargo.w * 0.8, kargo.h * 0.8); } pop(); if ( gleen.x < kargo.x + kargo.w && gleen.x + gleen.w > kargo.x && gleen.y < kargo.y + kargo.h && gleen.y + gleen.h > kargo.y ) { score += kargo.isBonus ? 5 : 1; kargo.active = false; if (score >= 50 && !giftMessage) { } } else if (kargo.y > height + kargo.h) { let wasBonus = kargo.isBonus; kargo.active = false; if (!wasBonus) { misses += 1; if (misses >= 3) { finalScore = score; gameOver = true; } } } } const t = texts[currentLang]; fill(50); textSize( isVertical ? 16 : 18 ); textAlign(LEFT, TOP); let textY = isVertical ? 15 : 20; let textOffset = isVertical ? 25 : 30; text(t.scoreLabel + score, 15, textY); text(t.missedLabel + misses + '/3', 15, textY + textOffset); text(t.livesLabel + lives, 15, textY + textOffset * 2); if (giftMessage) { } }
+function startGame() { /* ... (öncekiyle aynı) ... */ const emailInput = document.getElementById('emailInput'); const emailError = document.getElementById('emailError'); const email = emailInput.value.trim(); if (isValidEmail(email)) { emailError.style.display = 'none'; lives = checkLives(); if (lives > 0) { document.getElementById('startScreen').style.display = 'none'; document.getElementById('gameCanvas').style.display = 'block'; document.getElementById('restartButton').style.display = 'none'; document.getElementById('message').style.display = 'none'; resetGame(); frameCount = 0; loop(); console.log('Oyun başlatıldı.'); } else { document.getElementById('message').innerText = texts[currentLang].noMoreLives; document.getElementById('message').style.display = 'block'; } } else { emailError.style.display = 'block'; } }
+function restartGame() { /* ... (öncekiyle aynı) ... */ if (lives > 0) { updateStoredLives(lives - 1); if (lives > 0) { document.getElementById('restartButton').style.display = 'none'; document.getElementById('message').style.display = 'none'; if(confettiInterval) { clearInterval(confettiInterval); confettiInterval = null;} resetGame(); frameCount = 0; loop(); console.log('Oyun yeniden başlatıldı.'); } else { finalScore = score; gameOver = true; console.log('Son hak kullanıldı, oyun bitti.'); redraw(); } } }
+function resetGame() { /* ... (öncekiyle aynı) ... */ score = 0; misses = 0; giftMessage = ''; gameOver = false; finalScore = 0; for (let i = 0; i < kargoPool.length; i++) { kargoPool[i].active = false; } if (gleen) { gleen.x = width / 2 - gleen.w / 2; gleen.y = height - (isVertical ? 40 : 60); } document.getElementById('message').style.display = 'none'; document.getElementById('restartButton').style.display = 'none'; if(confettiInterval) { clearInterval(confettiInterval); confettiInterval = null;} }
 
-function setup() { /* ... (öncekiyle aynı, havuz oluşturma dahil) ... */
-    let canvasW, canvasH; let w = windowWidth; let h = windowHeight; if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; } else { isVertical = false; canvasW = 800; canvasH = 600; } gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas'); let gleenWidth = 50; let gleenHeight = 15; let gleenY = canvasH - (isVertical ? 40 : 60); gleen = { x: canvasW / 2 - gleenWidth / 2, y: gleenY, w: gleenWidth, h: gleenHeight }; kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); } console.log(MAX_KARGOS + " kapasiteli kargo havuzu oluşturuldu."); lives = checkLives(); console.log('Kurulum Bitti. Mod:', isVertical ? 'Dikey' : 'Yatay', 'Boyut:', round(canvasW), 'x', round(canvasH), 'Haklar:', lives); document.getElementById('lang-tr').addEventListener('click', () => { if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); } }); document.getElementById('lang-en').addEventListener('click', () => { if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); } }); updateTexts(currentLang); noLoop();
-}
-
-function draw() { /* ... (öncekiyle aynı, object pooling kullanıyor) ... */
-    background(canvasBackgroundColor); if (gameOver) { const reward = getReward(finalScore, currentLang); const t = texts[currentLang]; const messageEl = document.getElementById('message'); messageEl.innerHTML = ''; messageEl.className = ''; if (reward && reward.amount) { messageEl.classList.add('winMessage'); messageEl.innerHTML = `<strong>${t.winMessagePart1}${finalScore}${t.winMessagePart2}${reward.amount}${t.winMessagePart3}</strong><br><br>${t.winInstructions}`; if (!confettiInterval) { triggerConfetti(); } } else { messageEl.classList.remove('winMessage'); messageEl.innerText = `${t.gameOverBase} ${finalScore}`; } messageEl.style.display = 'block'; if (lives > 0) { document.getElementById('restartButton').style.display = 'block'; } else { document.getElementById('restartButton').style.display = 'none'; let noLivesEl = document.getElementById('noLivesMessage'); if (!noLivesEl) { messageEl.innerHTML += `<br><br><strong style="color: red;">${t.noMoreLives}</strong>`; } else { noLivesEl.innerText = t.noMoreLives; noLivesEl.style.display = 'block'; } } noLoop(); return; } fill(playerColor); noStroke(); rect(gleen.x, gleen.y, gleen.w, gleen.h, 5); gleen.x = constrain(mouseX - gleen.w / 2, 0, width - gleen.w); let spawnRate = 50; let minSpeed = 3; let maxSpeed = 7; if (score >= 30) { spawnRate = 40; minSpeed = 5; maxSpeed = 11; } else if (score >= 15) { spawnRate = 45; minSpeed = 4; maxSpeed = 9; } if (frameCount % spawnRate === 0 && lives > 0) { spawnKargoFromPool(minSpeed, maxSpeed); } for (let i = 0; i < kargoPool.length; i++) { let kargo = kargoPool[i]; if (!kargo.active) { continue; } let speedMultiplier = deltaTime / (1000 / 60); if (isNaN(speedMultiplier) || speedMultiplier <= 0 || speedMultiplier > 5) { speedMultiplier = 1; } kargo.y += kargo.speed * speedMultiplier; push(); translate(kargo.x + kargo.w / 2, kargo.y + kargo.h / 2); imageMode(CENTER); if (kargo.isBonus && kyrosilLogo) { image(kyrosilLogo, 0, 0, kargo.w, kargo.h); } else if (!kargo.isBonus && trendyolLogo) { image(trendyolLogo, 0, 0, kargo.w, kargo.h); } else { rectMode(CENTER); fill(kargo.isBonus ? color(255, 215, 0) : color(139, 69, 19)); rect(0, 0, kargo.w * 0.8, kargo.h * 0.8); } pop(); if ( gleen.x < kargo.x + kargo.w && gleen.x + gleen.w > kargo.x && gleen.y < kargo.y + kargo.h && gleen.y + gleen.h > kargo.y ) { score += kargo.isBonus ? 5 : 1; kargo.active = false; if (score >= 50 && !giftMessage) { } } else if (kargo.y > height + kargo.h) { let wasBonus = kargo.isBonus; kargo.active = false; if (!wasBonus) { misses += 1; if (misses >= 3) { finalScore = score; gameOver = true; } } } } const t = texts[currentLang]; fill(50); textSize( isVertical ? 16 : 18 ); textAlign(LEFT, TOP); let textY = isVertical ? 15 : 20; let textOffset = isVertical ? 25 : 30; text(t.scoreLabel + score, 15, textY); text(t.missedLabel + misses + '/3', 15, textY + textOffset); text(t.livesLabel + lives, 15, textY + textOffset * 2); if (giftMessage) { }
-}
-
-
-// --- HTML Butonlarından Çağrılan Fonksiyonlar ---
-// ... (startGame, restartGame, resetGame - Öncekiyle aynı) ...
-function startGame() { const emailInput = document.getElementById('emailInput'); const emailError = document.getElementById('emailError'); const email = emailInput.value.trim(); if (isValidEmail(email)) { emailError.style.display = 'none'; lives = checkLives(); if (lives > 0) { document.getElementById('startScreen').style.display = 'none'; document.getElementById('gameCanvas').style.display = 'block'; document.getElementById('restartButton').style.display = 'none'; document.getElementById('message').style.display = 'none'; resetGame(); frameCount = 0; loop(); console.log('Oyun başlatıldı.'); } else { document.getElementById('message').innerText = texts[currentLang].noMoreLives; document.getElementById('message').style.display = 'block'; } } else { emailError.style.display = 'block'; } }
-function restartGame() { if (lives > 0) { updateStoredLives(lives - 1); if (lives > 0) { document.getElementById('restartButton').style.display = 'none'; document.getElementById('message').style.display = 'none'; if(confettiInterval) { clearInterval(confettiInterval); confettiInterval = null;} resetGame(); frameCount = 0; loop(); console.log('Oyun yeniden başlatıldı.'); } else { finalScore = score; gameOver = true; console.log('Son hak kullanıldı, oyun bitti.'); redraw(); } } }
-function resetGame() { score = 0; misses = 0; giftMessage = ''; gameOver = false; finalScore = 0; for (let i = 0; i < kargoPool.length; i++) { kargoPool[i].active = false; } if (gleen) { gleen.x = width / 2 - gleen.w / 2; gleen.y = height - (isVertical ? 40 : 60); } document.getElementById('message').style.display = 'none'; document.getElementById('restartButton').style.display = 'none'; if(confettiInterval) { clearInterval(confettiInterval); confettiInterval = null;} }
-
-
-// --- YENİ EKLENEN DOKUNMA FONKSİYONLARI ---
-function touchStarted() {
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-     return false; // Varsayılanı engelle
-  }
-}
-
-function touchMoved() {
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-     return false; // Varsayılanı engelle (Kaydırma için en önemlisi)
-  }
-}
-
-function touchEnded() {
-  // Özel bir işlem gerekmiyorsa boş bırakılabilir veya kaldırılabilir.
-}
-// --- DOKUNMA FONKSİYONLARI BİTTİ ---
+// --- Dokunma Fonksiyonları ---
+// ... (Öncekiyle aynı) ...
+function touchStarted() { if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) { return false; } }
+function touchMoved() { if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) { return false; } }
+function touchEnded() { }
