@@ -2,16 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gleen's Trendyol Kargo Yakalama Oyunu</title>
+  <title>Trendyol Kargo Kapmaca</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
   <style>
     body { margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
     canvas { border: 2px solid #000; }
-    #restartButton { display: none; margin-top: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #startButton, #restartButton, #message { display: none; margin-top: 10px; padding: 10px 20px; font-size: 16px; }
+    #startButton, #restartButton { cursor: pointer; background-color: #ff6200; color: white; border: none; border-radius: 5px; }
+    #message { color: red; }
+    #startScreen { text-align: center; }
+    #startScreen img { margin: 10px; }
   </style>
 </head>
 <body>
   <div id="gameCanvas"></div>
+  <div id="startScreen">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pCKN8VDz8eHVrMoM-faHQj3O4HDD12bTLg&s" alt="Trendyol Logo" width="100">
+    <img src="https://kyrosil.wordpress.com/wp-content/uploads/2025/04/cropped-adsiz_tasarim-removebg-preview-1.png?w=300" alt="Kyrosil Logo" width="100">
+    <h2>Trendyol Kargo Kapmaca</h2>
+    <p>50 puana ulaş, <strong>50 TL Trendyol Hediye Çeki</strong> kazan!</p>
+    <p>Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
+    <button id="startButton" onclick="startGame()">Başla</button>
+  </div>
+  <div id="message"></div>
   <button id="restartButton" onclick="restartGame()">Yeniden Başlat</button>
 <script>
 let gleen;
@@ -20,6 +33,38 @@ let score = 0;
 let misses = 0;
 let giftMessage = '';
 let gameOver = false;
+let lives = 3;
+let trendyolLogo, kyrosilLogo;
+let gameState = 'startScreen';
+
+function checkLives() {
+  const today = new Date().toDateString();
+  const storedDate = localStorage.getItem('gameDate');
+  const storedLives = parseInt(localStorage.getItem('lives')) || 3;
+
+  if (storedDate !== today) {
+    localStorage.setItem('gameDate', today);
+    localStorage.setItem('lives', 3);
+    return 3;
+  }
+  return storedLives;
+}
+
+function updateLives() {
+  lives = checkLives();
+  if (lives <= 0) {
+    gameOver = true;
+    document.getElementById('message').style.display = 'block';
+    document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
+    document.getElementById('restartButton').style.display = 'none';
+    noLoop();
+  }
+}
+
+function preload() {
+  trendyolLogo = loadImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pCKN8VDz8eHVrMoM-faHQj3O4HDD12bTLg&s');
+  kyrosilLogo = loadImage('https://kyrosil.wordpress.com/wp-content/uploads/2025/04/cropped-adsiz_tasarim-removebg-preview-1.png?w=300');
+}
 
 function setup() {
   let canvas = createCanvas(800, 600);
@@ -31,53 +76,64 @@ function setup() {
   giftMessage = '';
   gameOver = false;
   document.getElementById('restartButton').style.display = 'none';
+  document.getElementById('message').style.display = 'none';
+  updateLives();
 }
 
 function draw() {
   background(220);
-  
+
+  if (gameState === 'startScreen') {
+    document.getElementById('startScreen').style.display = 'block';
+    document.getElementById('gameCanvas').style.display = 'none';
+    noLoop();
+    return;
+  }
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameCanvas').style.display = 'block';
+
   if (gameOver) {
     fill(255, 0, 0);
     textSize(40);
     textAlign(CENTER);
-    text('Game Over! Puan: ' + score, width / 2, height / 2);
-    document.getElementById('restartButton').style.display = 'block';
+    if (lives > 0) {
+      text('Game Over! Puan: ' + score, width / 2, height / 2);
+      document.getElementById('restartButton').style.display = 'block';
+    } else {
+      text('Hakların Bitti! Yarın Tekrar Dene!', width / 2, height / 2);
+      document.getElementById('message').style.display = 'block';
+      document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
+    }
     noLoop();
     return;
   }
-  
-  // Gleen'i çiz (mavi kare)
+
   fill(0, 0, 255);
   rect(gleen.x, gleen.y, gleen.w, gleen.h);
-  
-  // Gleen'i fareyle hareket ettir
+
   gleen.x = mouseX - gleen.w / 2;
   if (gleen.x < 0) gleen.x = 0;
   if (gleen.x > width - gleen.w) gleen.x = width - gleen.w;
-  
-  // Yeni kargo ekle (rastgele)
-  if (frameCount % 60 === 0) {
-    let isBonus = random(1) < 0.15; // %15 ihtimalle bonus kargo
+
+  if (frameCount % 60 === 0 && lives > 0) {
+    let isBonus = random(1) < 0.15;
     kargolar.push({
       x: random(width - 30),
       y: 0,
       w: 30,
       h: 30,
-      speed: random(4, 8), // Daha hızlı kargolar
+      speed: random(4, 8),
       isBonus: isBonus
     });
   }
-  
-  // Kargoları çiz ve hareket ettir
+
   for (let i = kargolar.length - 1; i >= 0; i--) {
     let kargo = kargolar[i];
     kargo.y += kargo.speed;
-    
-    // Kargo rengi (sarı: bonus, kahverengi: normal)
-    fill(kargo.isBonus ? 'yellow' : 'brown');
-    rect(kargo.x, kargo.y, kargo.w, kargo.h);
-    
-    // Çarpışma kontrolü
+
+    image(kargo.isBonus ? kyrosilLogo : trendyolLogo, kargo.x, kargo.y, kargo.w, kargo.h);
+
     if (
       gleen.x < kargo.x + kargo.w &&
       gleen.x + gleen.w > kargo.x &&
@@ -86,29 +142,30 @@ function draw() {
     ) {
       score += kargo.isBonus ? 5 : 1;
       kargolar.splice(i, 1);
-      
-      // Hediye çeki kontrolü
+
       if (score >= 50) {
         giftMessage = 'Tebrikler! 50 TL Trendyol Hediye Çeki Kazandın!';
       }
     }
-    
-    // Kargo ekran dışına çıkarsa
+
     if (kargo.y > height) {
       kargolar.splice(i, 1);
       misses += 1;
       if (misses >= 3) {
         gameOver = true;
+        lives -= 1;
+        localStorage.setItem('lives', lives);
+        updateLives();
       }
     }
   }
-  
-  // Puan, kaçırma sayısı ve hediye çeki mesajını göster
+
   fill(0);
   textSize(20);
   textAlign(LEFT);
   text('Puan: ' + score, 10, 30);
   text('Kaçırılan: ' + misses + '/3', 10, 60);
+  text('Hak: ' + lives + '/3', 10, 90);
   if (giftMessage) {
     textAlign(CENTER);
     textSize(24);
@@ -117,9 +174,24 @@ function draw() {
   }
 }
 
+function startGame() {
+  if (lives > 0) {
+    gameState = 'playing';
+    setup();
+    loop();
+  } else {
+    document.getElementById('message').style.display = 'block';
+    document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
+  }
+}
+
 function restartGame() {
-  setup();
-  loop();
+  if (lives > 0) {
+    lives -= 1;
+    localStorage.setItem('lives', lives);
+    setup();
+    loop();
+  }
 }
 </script>
 </body>
