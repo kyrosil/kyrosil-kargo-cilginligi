@@ -4,25 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trendyol Kargo Kapmaca</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="gameCanvas"></div>
 
-  <div id="startScreen">
-    <img src="images.jpg" alt="Trendyol Logo">
-      <img src="cropped-adsiz_tasarim-removebg-preview-1.png" alt="Kyrosil Logo">
-    <h2>Trendyol Kargo Kapmaca</h2>
-    <p>50 puana ulaş, <strong>50 TL Trendyol Hediye Çeki</strong> kazan!</p>
-    <p>Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
-    <button id="startButton" onclick="startGame()">Başla</button>
-  </div>
+  <div class="main-container">
 
-  <div id="message"></div>
+    <div id="gameCanvas"></div>
 
-  <button id="restartButton" onclick="restartGame()">Yeniden Başlat</button>
+    <div id="startScreen">
+      <div id="logoContainer">
+        <img src="images.jpg" alt="Trendyol Logo">
+        <img src="cropped-adsiz_tasarim-removebg-preview-1.png" alt="Kyrosil Logo">
+      </div>
+      <h2>Trendyol Kargo Kapmaca</h2>
+      <p>50 puana ulaş, <strong>50 TL Trendyol Hediye Çeki</strong> kazan!</p>
+      <p>Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
+      <button id="startButton" onclick="startGame()">Başla</button>
+    </div>
 
-  <script src="script.js"></script>
+    <div id="message"></div>
+
+    <button id="restartButton" onclick="restartGame()">Yeniden Başlat</button>
+
+  </div> <script src="script.js"></script>
 </body>
 </html>
