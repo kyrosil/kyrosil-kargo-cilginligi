@@ -1,46 +1,74 @@
-/* Google Font import (alternatif yöntem) */
+/* Google Font import */
 /* @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap'); */
 
 body {
   margin: 0;
-  padding: 20px; /* Kenarlarda genel boşluk */
-  display: flex; /* İçeriği ortalamak için */
+  padding: 15px; /* Mobil için default padding */
+  display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /* Arka Plan Gradient Eklendi */
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  /* Font Ailesi Ayarlandı */
   font-family: 'Nunito', sans-serif;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* Ana İçerik Kapsayıcısı Stili */
 .main-container {
-  background-color: #ffffff; /* Beyaz arka plan */
-  padding: 20px;
-  border-radius: 15px; /* Yuvarlak köşeler */
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Daha belirgin gölge */
-  width: 100%; /* Genişliği doldur */
-  max-width: 900px; /* Maksimum genişlik (PC için) */
+  background-color: #ffffff;
+  padding: 20px 15px; /* Yanlardan biraz daha az */
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* İçerikleri ortala */
+  align-items: center;
   box-sizing: border-box;
+  position: relative; /* Dil butonları için */
 }
 
+/* Dil Seçim Butonları */
+#lang-selector {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 5px; /* Butonlar arası boşluk */
+}
+
+.lang-button {
+  padding: 5px 10px;
+  font-size: 0.8em;
+  font-weight: 700;
+  border: 1px solid #ddd;
+  background-color: #f0f0f0;
+  color: #555;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-button:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.lang-button.active { /* Aktif dil butonu */
+  background-color: #ff6200;
+  color: white;
+  border-color: #ff6200;
+  cursor: default;
+}
 
 #gameCanvas {
-  /* border: 2px solid #000; - Kenarlık yerine gölge */
-  border: none; /* Eski kenarlığı kaldır */
-  display: none; /* Başlangıçta gizli */
-  margin-top: 20px;
+  border: none;
+  display: none;
+  margin-top: 10px; /* Dil butonuyla çakışmasın diye az margin */
   margin-bottom: 20px;
-  /* Gölge ve Yuvarlak Köşe Eklendi */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  border-radius: 10px; /* Canvas köşelerini yuvarlat */
-  overflow: hidden; /* İçerik taşmasın (gerçi canvas kendi sınırları var) */
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 #startScreen {
@@ -48,110 +76,204 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 30px; /* İç boşluk artırıldı */
-  max-width: 95%;
+  padding: 20px 10px; /* Yan padding azaltıldı */
+  width: 100%; /* Konteynerin içini doldur */
+  max-width: 600px; /* Başlangıç ekranı çok geniş olmasın */
   box-sizing: border-box;
-  /* Başlangıç ekranına da hafif stil verelim */
-  background-color: #f8f9fa; /* Çok hafif gri arka plan */
+  background-color: #f8f9fa;
   border-radius: 10px;
-  margin-bottom: 20px; /* Alt boşluk */
+  margin-top: 40px; /* Dil butonu için boşluk */
+  margin-bottom: 20px;
 }
 
-/* Logo Konteyneri */
 #logoContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 15px; /* Altındaki başlıkla arasına boşluk */
+    margin-bottom: 10px;
 }
 
 #startScreen img {
-  margin: 5px 15px; /* Logolar arası boşluk */
-  width: 90px; /* Biraz küçülttüm */
+  margin: 5px 10px;
+  width: 80px;
   vertical-align: middle;
 }
 
-
-#startButton, #restartButton, #message {
-  margin-top: 25px; /* Boşluk artırıldı */
-  padding: 13px 30px; /* Boyut artırıldı */
-  font-size: 1.1em; /* Font boyutu */
-  font-weight: 700; /* Kalın font */
+/* Bilgi Alanı Stilleri */
+#infoSection {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    width: 90%;
+    box-sizing: border-box;
 }
 
-#startButton, #restartButton {
-  cursor: pointer;
-  background-color: #ff6200;
-  color: white;
-  border: none;
-  border-radius: 8px; /* Daha yuvarlak köşeler */
-  transition: background-color 0.3s ease, transform 0.1s ease; /* Geçiş efekti */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+#rewardTitle {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #333;
 }
 
-#startButton:hover, #restartButton:hover {
-    background-color: #e65a00;
-    transform: translateY(-1px); /* Hafif yukarı kalkma efekti */
+#rewardList {
+    list-style: none; /* Madde işareti olmasın */
+    padding: 0;
+    margin: 0 0 10px 0;
+    font-size: 0.95em;
+    color: #555;
 }
-#startButton:active, #restartButton:active {
-    transform: translateY(1px); /* Basılma efekti */
-    box-shadow: none;
+#rewardList li {
+    margin-bottom: 5px;
+}
+#rewardList strong { /* Puan kısmı */
+    color: #000;
+    display: inline-block;
+    min-width: 70px; /* Puanlar hizalı dursun */
+    text-align: right;
+    margin-right: 5px;
+}
+#rewardList span { /* Ödül kısmı */
+    color: #ff6200;
+    font-weight: 700;
+}
+
+#pointInfo {
+    font-size: 0.9em;
+    color: #666;
+    margin: 10px 0 0 0;
+}
+
+.important-note { /* Avrupa notu için */
+    font-size: 0.85em;
+    color: #dc3545; /* Kırmızı */
+    font-weight: 700;
+    margin-top: 10px;
+    border: 1px solid #f5c6cb;
+    background-color: #f8d7da;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+#howToPlay {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+/* E-posta Alanı */
+#emailSection {
+    margin: 20px 0;
+    width: 90%;
+}
+#emailLabel {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    font-weight: 700;
+    color: #555;
+}
+#emailInput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box; /* Padding içeri dahil */
+}
+#emailInput:focus {
+    border-color: #ff9933;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.2);
+}
+.error-message {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 5px;
 }
 
 
-#restartButton {
-  display: none;
+#startButton, #restartButton { /* Butonlar genel */
+  margin-top: 10px; /* Email alanı sonrası boşluk */
+  padding: 12px 28px;
+  font-size: 1.05em;
+  font-weight: 700;
 }
 
-#message {
-  color: #dc3545; /* Daha standart bir kırmızı tonu */
+#message { /* Hata/Bilgi Mesajı (Oyun Sonu) */
+  color: #dc3545;
   display: none;
   font-weight: 700;
   margin-top: 15px;
+  text-align: center;
+  width: 90%;
+}
+/* Kazanma mesajı için özel stil */
+#winMessage {
+    color: #155724; /* Koyu Yeşil */
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.6;
+}
+#winMessage strong { /* Puan ve Miktar */
+    color: #000;
 }
 
-h2 {
-  color: #343a40; /* Daha koyu gri */
-  font-size: 2.2em;
-  margin-bottom: 0.6em;
+
+h2#game-title { /* Başlık ID eklendi */
+  color: #343a40;
+  font-size: 2em; /* Biraz küçülttüm */
+  margin-bottom: 0.5em;
   font-weight: 700;
 }
 
 p {
-  color: #495057; /* Biraz daha koyu gri */
+  color: #495057;
   line-height: 1.6;
-  font-size: 1.05em;
+  font-size: 1em;
   margin-top: 0.6em;
 }
-p strong {
-    color: #ff6200; /* Vurgu rengi */
-}
+p strong { color: #ff6200; }
 
-/* --- Mobil İyileştirmeleri (Media Query) --- */
+/* --- Mobil İyileştirmeleri --- */
 @media (max-width: 768px) {
-  body {
-     padding: 10px; /* Mobil için padding azalt */
-  }
-  .main-container {
-      padding: 15px;
-      /* max-width: 95%; */ /* Zaten %100 */
-  }
-
-  #startScreen {
-      padding: 20px;
-  }
-  #startScreen img { width: 75px; }
-  h2 { font-size: 1.8em; }
-  p { font-size: 1em; }
-  #startButton, #restartButton { font-size: 1em; padding: 12px 25px; }
-  #message { font-size: 0.9em; }
+  body { padding: 10px; }
+  .main-container { padding: 10px; max-width: 100%; }
+  #lang-selector { top: 10px; right: 10px; }
+  #startScreen { margin-top: 50px; padding: 15px 5px; } /* Üst boşluk artırıldı */
+  #startScreen img { width: 70px; }
+  h2#game-title { font-size: 1.7em; }
+  p { font-size: 0.95em; }
+  #infoSection { width: 95%; padding: 10px; }
+  #rewardTitle { font-size: 1.1em; }
+  #rewardList { font-size: 0.9em; }
+  #rewardList strong { min-width: 50px; }
+  #pointInfo { font-size: 0.85em; }
+  .important-note { font-size: 0.8em; padding: 6px;}
+  #emailSection { width: 95%; }
+  #emailLabel { font-size: 0.9em; }
+  #emailInput { font-size: 0.95em; padding: 8px; }
+  #startButton, #restartButton { font-size: 1em; padding: 10px 20px; }
+  #message, #winMessage { font-size: 0.9em; width: 95%; padding: 10px; }
 }
 
 @media (max-width: 480px) {
-   h2 { font-size: 1.5em; }
-   p { font-size: 0.9em; }
-   #startButton, #restartButton { font-size: 0.95em; padding: 10px 20px; }
-   #message { font-size: 0.85em; }
-   #startScreen img { width: 65px; }
+   #startScreen img { width: 60px; }
+   h2#game-title { font-size: 1.4em; }
+   p { font-size: 0.85em; }
+   #infoSection { width: 98%; padding: 8px;}
+   #rewardTitle { font-size: 1em; }
+   #rewardList { font-size: 0.8em; }
+   #pointInfo { font-size: 0.8em; }
+   .important-note { font-size: 0.75em;}
+   #emailLabel { font-size: 0.85em; }
+   #startButton, #restartButton { font-size: 0.9em; padding: 9px 18px; }
+   #message, #winMessage { font-size: 0.85em; padding: 8px; }
 }
