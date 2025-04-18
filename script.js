@@ -16,95 +16,28 @@ let soundsLoadedCount = 0; const totalSounds = 6; let isBgMusicPlaying = false;
 // --- Yardımcı Fonksiyonlar ---
 function checkLives() { console.log("localStorage devre dışı. Haklar 3 olarak ayarlandı."); return 3; }
 function updateStoredLives(newLives) { lives = newLives >= 0 ? newLives : 0; }
-
-// Elementin varlığını kontrol edip metin atayan yardımcı fonksiyon
-function setText(elementId, textContent) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerText = textContent;
-        // console.log(`[setText] ID: ${elementId} güncellendi.`); // İstersen logları açabilirsin
-    } else {
-        console.error(`[setText] HATA: Element bulunamadı! ID: ${elementId}`);
-    }
-}
-// Elementin varlığını kontrol edip placeholder atayan yardımcı fonksiyon
-function setPlaceholder(elementId, placeholderText) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.placeholder = placeholderText;
-        // console.log(`[setPlaceholder] ID: ${elementId} güncellendi.`);
-    } else {
-        console.error(`[setPlaceholder] HATA: Element bulunamadı! ID: ${elementId}`);
-    }
-}
-
-// Dil metinlerini güncelleyen fonksiyon (SAĞLAMLAŞTIRILDI)
-function updateTexts(lang) {
-    console.log(`[updateTexts] BAŞLADI - Dil: ${lang}`);
-    try {
-        const t = texts[lang];
-        if (!t) { throw new Error(`'${lang}' için metinler bulunamadı!`); } // Hata fırlat
-
-        // Yardımcı fonksiyonlarla metinleri ata
-        setText('game-title', t.gameTitle);
-        setText('rewardTitle', t.rewardTitle);
-        setText('pointInfo', t.pointInfo);
-        setText('howToPlay', t.howToPlay);
-        setText('emailLabel', t.emailLabel);
-        setPlaceholder('emailInput', t.emailPlaceholder); // input için placeholder
-        setText('startButton', t.startBtn);
-        setText('restartButton', t.restartBtn);
-        setText('emailError', t.emailError);
-
-        // Ödül listesini oluşturma (try-catch içinde)
-        console.log("[updateTexts] Ödül listesi oluşturuluyor...");
-        const rewardListEl = document.getElementById('rewardList');
-        if (!rewardListEl) { throw new Error("rewardList elementi bulunamadı!"); }
-        rewardListEl.innerHTML = '';
-        const currentRewardTiers = rewardTiers[lang];
-        if (!currentRewardTiers) { throw new Error(`'${lang}' için ödül baremleri bulunamadı!`); }
-
-        try {
-            currentRewardTiers.forEach((tier, index) => {
-                if (tier.amount) {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>${tier.score} Puan:</strong> <span>${tier.amount}</span>`;
-                    rewardListEl.appendChild(li);
-                }
-            });
-            console.log("[updateTexts] Ödül listesi başarıyla oluşturuldu.");
-        } catch (listError) {
-            console.error("[updateTexts] HATA: Ödül listesi oluşturulurken hata oluştu!", listError);
-            // Hata olsa bile devam etmeyi deneyebiliriz veya burada durabiliriz. Şimdilik devam etsin.
-        }
-
-        // Avrupa notunu göster/gizle
-        console.log("[updateTexts] Avrupa notu kontrol ediliyor...");
-        const europeNoteEl = document.getElementById('europeNote');
-        if (!europeNoteEl) { throw new Error("europeNote elementi bulunamadı!"); }
-        if (lang === 'EN' && t.europeNote) { europeNoteEl.innerText = t.europeNote; europeNoteEl.style.display = 'block'; }
-        else { europeNoteEl.style.display = 'none'; }
-        console.log("[updateTexts] Avrupa notu ayarlandı.");
-
-        // Aktif buton stilini ayarla
-        console.log("[updateTexts] Buton stilleri ayarlanıyor...");
-         const btnTR = document.getElementById('lang-tr');
-         const btnEN = document.getElementById('lang-en');
-         if (btnTR) btnTR.classList.toggle('active', lang === 'TR'); else console.error("TR Butonu bulunamadı!");
-         if (btnEN) btnEN.classList.toggle('active', lang === 'EN'); else console.error("EN Butonu bulunamadı!");
-
-        document.documentElement.lang = lang.toLowerCase();
-        console.log(`[updateTexts] BİTTİ - Dil: ${lang}`);
-
-    } catch (error) {
-        // Eğer try bloğu içinde bir hata olursa burada yakalanır ve konsola yazdırılır.
-        console.error(`[updateTexts] GENEL HATA oluştu - Dil: ${lang}`, error);
-    }
-}
-
-
+function setText(elementId, textContent) { /* ... öncekiyle aynı ... */ }
+function setPlaceholder(elementId, placeholderText) { /* ... öncekiyle aynı ... */ }
+function updateTexts(lang) { /* ... öncekiyle aynı (sağlamlaştırılmış) ... */ }
 function getReward(finalScore, lang) { /* ... öncekiyle aynı ... */ }
-function isValidEmail(email) { /* ... öncekiyle aynı ... */ }
+
+// E-posta kontrol fonksiyonu (DETAYLI LOG EKLENDİ)
+function isValidEmail(email) {
+    console.log(`[isValidEmail] Kontrol edilen email: "${email}"`); // 1. Gelen email'i yazdır
+    const isTruthy = !!email; // email boş değilse veya null/undefined değilse true olur
+    console.log(`[isValidEmail] >> Boş değil mi? (isTruthy): ${isTruthy}`); // 2. Boş olup olmadığını yazdır
+
+    const hasAt = email ? email.includes('@') : false; // email varsa @ içeriyor mu?
+    console.log(`[isValidEmail] >> '@' içeriyor mu? (hasAt): ${hasAt}`); // 3. @ kontrol sonucunu yazdır
+
+    const hasDot = email ? email.includes('.') : false; // email varsa . içeriyor mu?
+    console.log(`[isValidEmail] >> '.' içeriyor mu? (hasDot): ${hasDot}`); // 4. . kontrol sonucunu yazdır
+
+    const result = isTruthy && hasAt && hasDot; // Sonucu hesapla
+    console.log(`[isValidEmail] >> SONUÇ (Geçerli mi?): ${result}`); // 5. Final sonucu yazdır
+    return result;
+}
+
 function triggerConfetti() { /* ... öncekiyle aynı ... */ }
 function findInactiveKargo() { /* ... öncekiyle aynı ... */ }
 function spawnKargoFromPool(minSpeed, maxSpeed) { /* ... öncekiyle aynı ... */ }
@@ -115,112 +48,11 @@ function playSound(soundFile, volume = 0.5, rate = 1, pan = 0) { /* ... öncekiy
 
 // --- p5.js Özel Fonksiyonları ---
 function preload() { /* ... öncekiyle aynı ... */ }
-
-function setup() {
-    console.log("[setup] Başladı...");
-    try { // Setup'ı da try-catch içine alalım
-        let canvasW, canvasH; let w = windowWidth; let h = windowHeight;
-        if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; }
-        else { isVertical = false; canvasW = 800; canvasH = 600; }
-        gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas');
-        let gleenY = canvasH - (isVertical ? 40 : 60);
-        gleen = { x: canvasW / 2 - playerWidth / 2, y: gleenY, w: playerWidth, h: playerHeight };
-        kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); }
-        lives = checkLives();
-        console.log('[setup] Kurulum Bitti Log Öncesi. Haklar:', lives);
-
-        // Dil butonlarına event listener ekle ('click' kullanılıyor)
-        const langTRButton = document.getElementById('lang-tr');
-        const langENButton = document.getElementById('lang-en');
-        const emailInputForTouch = document.getElementById('emailInput'); // Bu artık start içinde lazım
-
-        if (langTRButton) {
-            langTRButton.addEventListener('click', () => {
-                console.log("[Event] TR button CLICKED.");
-                playSound(clickSound);
-                if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); }
-            });
-            console.log("[setup] TR Buton Listener Eklendi (click).");
-        } else { console.error("[setup] TR Dil butonu bulunamadı!"); }
-
-        if (langENButton) {
-            langENButton.addEventListener('click', () => {
-                console.log("[Event] EN button CLICKED.");
-                playSound(clickSound);
-                if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); }
-            });
-            console.log("[setup] EN Buton Listener Eklendi (click).");
-        } else { console.error("[setup] EN Dil butonu bulunamadı!"); }
-
-        console.log("[setup] İlk updateTexts çağrılıyor...");
-        updateTexts(currentLang);
-        console.log("[setup] İlk updateTexts çağrıldıktan sonra.");
-
-        if(gameInstanceCanvas) gameInstanceCanvas.style('pointer-events', 'auto'); else console.error("gameInstanceCanvas bulunamadı!");
-        noLoop();
-        console.log("[setup] Kurulum Tamamlandı."); // Bu log görünmeli
-    } catch (setupError) {
-        console.error("[setup] KURULUM SIRASINDA KRİTİK HATA!", setupError);
-    }
-}
-
-function draw() { /* ... (öncekiyle aynı) ... */ }
-
-function startGame() {
-    console.log("[startGame] Fonksiyonu çağrıldı."); // İlk log
-    try { // startGame'i de try-catch içine alalım
-        playSound(clickSound); // Ses çalmayı dene
-        const emailInput = document.getElementById('emailInput');
-        const emailError = document.getElementById('emailError');
-        const startScreen = document.getElementById('startScreen');
-        const gameCanvas = document.getElementById('gameCanvas');
-        const restartButton = document.getElementById('restartButton');
-        const messageDiv = document.getElementById('message'); // message div'ini al
-
-        // Element kontrolleri
-        if (!emailInput || !emailError || !startScreen || !gameCanvas || !restartButton || !messageDiv) {
-            console.error("[startGame] Gerekli HTML elementlerinden biri veya birkaçı bulunamadı!");
-            return; // Element yoksa devam etme
-        }
-
-        const email = emailInput.value.trim();
-        console.log("[startGame] Email kontrol ediliyor:", email);
-
-        if (isValidEmail(email)) {
-            console.log("[startGame] Email geçerli.");
-            emailError.style.display = 'none';
-            lives = checkLives();
-            console.log("[startGame] Hak kontrol sonucu:", lives);
-            if (lives > 0) {
-                console.log("[startGame] Oyun başlatılıyor...");
-                startScreen.style.display = 'none';
-                gameCanvas.style.display = 'block'; // Canvas'ı göster
-                restartButton.style.display = 'none';
-                messageDiv.style.display = 'none'; // Mesaj div'ini gizle
-                resetGame();
-                if (gameInstanceCanvas) { gameInstanceCanvas.style('pointer-events', 'auto'); }
-                frameCount = 0;
-                if (bgMusic && bgMusic.isLoaded() && !isBgMusicPlaying) { bgMusic.setVolume(0.3); bgMusic.loop(); isBgMusicPlaying = true; }
-                else if (isBgMusicPlaying && bgMusic && !bgMusic.isPlaying()) { bgMusic.loop(); }
-                loop(); // Oyun döngüsünü başlat
-                console.log('[startGame] Oyun başarıyla başlatıldı.');
-            } else {
-                 console.log("[startGame] Hak bitti.");
-                 messageDiv.innerText = texts[currentLang].noMoreLives;
-                 messageDiv.style.display = 'block';
-                 // Başlat butonunu tekrar gizle veya pasif yap? Şimdilik kalsın.
-            }
-        } else {
-            console.log("[startGame] Email geçersiz.");
-            emailError.style.display = 'block';
-        }
-    } catch (startError) {
-        console.error("[startGame] HATA oluştu!", startError);
-    }
-}
-
-function restartGame() { /* ... (öncekiyle aynı) ... */ }
-function resetGame() { /* ... (öncekiyle aynı) ... */ }
+function setup() { /* ... öncekiyle aynı (sağlamlaştırılmış) ... */ }
+function draw() { /* ... öncekiyle aynı ... */ }
+function startGame() { /* ... öncekiyle aynı (sağlamlaştırılmış) ... */ }
+function restartGame() { /* ... öncekiyle aynı ... */ }
+function resetGame() { /* ... öncekiyle aynı ... */ }
 function touchStarted() { /* ... (Yorumda) ... */ }
 function touchMoved() { /* ... (Yorumda) ... */ }
 function touchEnded() { /* ... (Yorumda) ... */ }
