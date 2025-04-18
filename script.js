@@ -15,7 +15,6 @@ const normalKargoBoyutu = 35;
 const bonusKargoBoyutu = 55;
 
 // --- Yardımcı Fonksiyonlar ---
-// ... (checkLives ve updateStoredLives aynı kalıyor) ...
 function checkLives() {
   const today = new Date().toDateString();
   const storedDate = localStorage.getItem('gameDate');
@@ -29,10 +28,11 @@ function checkLives() {
   return isNaN(currentLives) || currentLives < 0 ? 3 : currentLives;
 }
 function updateStoredLives(newLives) {
+    // Bu fonksiyon sadece hak sayısını günceller ve localStorage'a yazar
     lives = newLives >= 0 ? newLives : 0;
     localStorage.setItem('lives', lives.toString());
+    console.log('Hak güncellendi (localStorage):', lives); // Bu log kalabilir
 }
-
 
 // --- p5.js Özel Fonksiyonları ---
 function preload() {
@@ -44,33 +44,25 @@ function preload() {
 
 function setup() {
     let canvasW, canvasH;
-
-    // <<<--- Algılama ve Boyutlandırma (Güncellendi) ---
     let w = windowWidth;
     let h = windowHeight;
-    console.log("Pencere Boyutları Algılandı:", w, "x", h); // LOG EKLENDİ
+    // console.log("Pencere Boyutları Algılandı:", w, "x", h);
 
-    // Dikey Mod Koşulu: Genişlik yükseklikten küçük VE genişlik 600px'den küçükse
-    if (w < h && w < 600) { // Eşik 768'den 600'e düşürüldü
+    if (w < h && w < 600) {
         isVertical = true;
-        console.log("KOŞUL SAĞLANDI: Dikey Mod (Mobil) Algılandı."); // LOG EKLENDİ
-        // Ekran genişliğinin %95'ini al
+        // console.log("KOŞUL SAĞLANDI: Dikey Mod (Mobil) Algılandı.");
         canvasW = w * 0.95;
-        // Yüksekliği basitçe ekran yüksekliğinin %80'i yapalım (test için)
         canvasH = h * 0.80;
-        console.log("Dikey Canvas Boyutu Hesaplanıyor:", canvasW, "x", canvasH); // LOG EKLENDİ
+        // console.log("Dikey Canvas Boyutu Hesaplanıyor:", canvasW, "x", canvasH);
     } else {
         isVertical = false;
-        // Koşulun neden sağlanmadığını loglayalım
-        if (w >= h) { console.log("KOŞUL SAĞLANMADI: Ekran yatay (veya kare)."); }
-        if (w >= 600) { console.log("KOŞUL SAĞLANMADI: Ekran genişliği >= 600px."); }
-        console.log("Yatay Mod (PC/Tablet) Algılandı."); // LOG EKLENDİ
-
+        // if (w >= h) { console.log("KOŞUL SAĞLANMADI: Ekran yatay (veya kare)."); }
+        // if (w >= 600) { console.log("KOŞUL SAĞLANMADI: Ekran genişliği >= 600px."); }
+        // console.log("Yatay Mod (PC/Tablet) Algılandı.");
         canvasW = 800;
         canvasH = 600;
-        console.log("Yatay Canvas Boyutu Ayarlandı:", canvasW, "x", canvasH); // LOG EKLENDİ
+        // console.log("Yatay Canvas Boyutu Ayarlandı:", canvasW, "x", canvasH);
     }
-    // --- Algılama Bitti ---
 
     gameInstanceCanvas = createCanvas(canvasW, canvasH);
     gameInstanceCanvas.parent('gameCanvas');
@@ -85,17 +77,16 @@ function setup() {
     noLoop();
 }
 
-// --- draw() ve diğer fonksiyonlar öncekiyle aynı kalabilir ---
-// ... (draw, startGame, restartGame, resetGame fonksiyonları önceki cevapta olduğu gibi) ...
+
 function draw() {
     background(200, 200, 255);
 
     if (gameOver) {
+        // ... (Oyun Bitti ekranı - Değişiklik yok) ...
         fill(255, 0, 0); textSize( isVertical ? 30 : 40 );
         textAlign(CENTER, CENTER);
         text('Oyun Bitti!\nPuan: ' + score, width / 2, height / 2 - (isVertical ? 30 : 40));
-
-        if (lives > 0) {
+        if (lives > 0) { // Hala hak varsa (restart butonuna basmadan önce)
             document.getElementById('restartButton').style.display = 'block';
              textSize( isVertical ? 16 : 20 ); fill(0);
              text('Tekrar denemek için\n1 hakkını kullan.', width / 2, height / 2 + (isVertical ? 30 : 40));
@@ -107,6 +98,7 @@ function draw() {
         noLoop(); return;
     }
 
+    // --- Oyun Devam Ediyor ---
     fill(255, 102, 0); noStroke();
     rect(gleen.x, gleen.y, gleen.w, gleen.h, 5);
     gleen.x = constrain(mouseX - gleen.w / 2, 0, width - gleen.w);
@@ -151,53 +143,70 @@ function draw() {
             if (!kacirilanKargo.isBonus) {
                 misses += 1;
                 if (misses >= 3) {
-                    console.log('3 kargo kaçırıldı, oyun bitti.');
-                    gameOver = true; updateStoredLives(lives - 1);
+                    console.log('3 kargo kaçırıldı, oyun bitti (hak henüz düşmedi).'); // LOG GÜNCELLENDİ
+                    gameOver = true;
+                    // updateStoredLives(lives - 1); // <<<--- BU SATIR YORUM YAPILDI/SİLİNDİ!
+                                                    // Hak düşürme işlemi artık sadece restartGame içinde.
                 }
             }
         }
     }
 
+    // Bilgileri Ekrana Yazdır
     fill(0); textSize( isVertical ? 16 : 20 );
     textAlign(LEFT, TOP);
     let textY = isVertical ? 15 : 20;
     let textOffset = isVertical ? 25 : 30;
     text('Puan: ' + score, 15, textY);
     text('Kaçırılan: ' + misses + '/3', 15, textY + textOffset);
-    text('Kalan Hak: ' + lives, 15, textY + textOffset * 2);
+    text('Kalan Hak: ' + lives, 15, textY + textOffset * 2); // O anki life değerini gösterir
 
     if (giftMessage) {
         textAlign(CENTER, CENTER); textSize( isVertical ? 22 : 28 ); fill(0, 150, 0);
         text(giftMessage, width / 2, height / 2);
     }
 }
+// --- HTML Butonlarından Çağrılan Fonksiyonlar ---
 function startGame() {
-  lives = checkLives();
+  lives = checkLives(); // Başlarken hakları kontrol et
   if (lives > 0) {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameCanvas').style.display = 'block';
     document.getElementById('restartButton').style.display = 'none';
     document.getElementById('message').style.display = 'none';
-    resetGame(); frameCount = 0; loop(); console.log('Oyun başlatıldı.');
+    resetGame(); frameCount = 0; loop();
+    console.log('Oyun başlatıldı.');
   } else {
     document.getElementById('message').style.display = 'block';
     document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
   }
 }
+
 function restartGame() {
-  if (lives > 0) {
-     updateStoredLives(lives - 1);
-     if (lives > 0) {
+  // Sadece bu fonksiyonda hak düşürülecek!
+  if (lives > 0) { // Başlamadan önce hak var mı kontrol et
+     updateStoredLives(lives - 1); // HAKKI BURADA DÜŞÜR VE KAYDET
+     // Şimdi tekrar kontrol et, hak kaldı mı?
+     if (lives > 0) { // Hak 0'a düşmediyse oyunu başlat
         document.getElementById('restartButton').style.display = 'none';
         document.getElementById('message').style.display = 'none';
-        resetGame(); frameCount = 0; loop(); console.log('Oyun yeniden başlatıldı.');
-     } else {
-        gameOver = true; console.log('Son hak kullanıldı, oyun bitti.'); redraw();
+        resetGame();
+        frameCount = 0;
+        loop();
+        console.log('Oyun yeniden başlatıldı.');
+     } else { // Hak 0 olduysa, oyunu bitir
+        gameOver = true;
+        console.log('Son hak kullanıldı, oyun bitti.');
+        redraw(); // Oyun bitti ekranını çizdir
      }
+  } else {
+       // Hak yoksa zaten bu butona basılamamalı ama güvenlik kontrolü
+       console.error("Hata: Hak yokken yeniden başlatma denendi!");
   }
 }
+
 function resetGame() {
     score = 0; misses = 0; kargolar = []; giftMessage = ''; gameOver = false;
     if (gleen) { gleen.x = width / 2 - gleen.w / 2; gleen.y = height - (isVertical ? 40 : 60); }
-    console.log("Oyun değişkenleri sıfırlandı.");
+    // console.log("Oyun değişkenleri sıfırlandı."); // İstersen bu log kalabilir
 }
