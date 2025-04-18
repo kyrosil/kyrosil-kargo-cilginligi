@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gleen's Trendyol Kargo Yakalama Oyunu</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
+    canvas { border: 2px solid #000; }
+    #restartButton { display: none; margin-top: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="gameCanvas"></div>
+  <button id="restartButton" onclick="restartGame()">Yeniden Başlat</button>
+<script>
+let gleen;
+let kargolar = [];
+let score = 0;
+let misses = 0;
+let giftMessage = '';
+let gameOver = false;
+
+function setup() {
+  let canvas = createCanvas(800, 600);
+  canvas.parent('gameCanvas');
+  gleen = { x: width / 2, y: height - 50, w: 50, h: 50 };
+  kargolar = [];
+  score = 0;
+  misses = 0;
+  giftMessage = '';
+  gameOver = false;
+  document.getElementById('restartButton').style.display = 'none';
+}
+
+function draw() {
+  background(220);
+  
+  if (gameOver) {
+    fill(255, 0, 0);
+    textSize(40);
+    textAlign(CENTER);
+    text('Game Over! Puan: ' + score, width / 2, height / 2);
+    document.getElementById('restartButton').style.display = 'block';
+    noLoop();
+    return;
+  }
+  
+  // Gleen'i çiz (mavi kare)
+  fill(0, 0, 255);
+  rect(gleen.x, gleen.y, gleen.w, gleen.h);
+  
+  // Gleen'i fareyle hareket ettir
+  gleen.x = mouseX - gleen.w / 2;
+  if (gleen.x < 0) gleen.x = 0;
+  if (gleen.x > width - gleen.w) gleen.x = width - gleen.w;
+  
+  // Yeni kargo ekle (rastgele)
+  if (frameCount % 60 === 0) {
+    let isBonus = random(1) < 0.15; // %15 ihtimalle bonus kargo
+    kargolar.push({
+      x: random(width - 30),
+      y: 0,
+      w: 30,
+      h: 30,
+      speed: random(4, 8), // Daha hızlı kargolar
+      isBonus: isBonus
+    });
+  }
+  
+  // Kargoları çiz ve hareket ettir
+  for (let i = kargolar.length - 1; i >= 0; i--) {
+    let kargo = kargolar[i];
+    kargo.y += kargo.speed;
+    
+    // Kargo rengi (sarı: bonus, kahverengi: normal)
+    fill(kargo.isBonus ? 'yellow' : 'brown');
+    rect(kargo.x, kargo.y, kargo.w, kargo.h);
+    
+    // Çarpışma kontrolü
+    if (
+      gleen.x < kargo.x + kargo.w &&
+      gleen.x + gleen.w > kargo.x &&
+      gleen.y < kargo.y + kargo.h &&
+      gleen.y + gleen.h > kargo.y
+    ) {
+      score += kargo.isBonus ? 5 : 1;
+      kargolar.splice(i, 1);
+      
+      // Hediye çeki kontrolü
+      if (score >= 50) {
+        giftMessage = 'Tebrikler! 50 TL Trendyol Hediye Çeki Kazandın!';
+      }
+    }
+    
+    // Kargo ekran dışına çıkarsa
+    if (kargo.y > height) {
+      kargolar.splice(i, 1);
+      misses += 1;
+      if (misses >= 3) {
+        gameOver = true;
+      }
+    }
+  }
+  
+  // Puan, kaçırma sayısı ve hediye çeki mesajını göster
+  fill(0);
+  textSize(20);
+  textAlign(LEFT);
+  text('Puan: ' + score, 10, 30);
+  text('Kaçırılan: ' + misses + '/3', 10, 60);
+  if (giftMessage) {
+    textAlign(CENTER);
+    textSize(24);
+    fill(255, 0, 0);
+    text(giftMessage, width / 2, height / 2);
+  }
+}
+
+function restartGame() {
+  setup();
+  loop();
+}
+</script>
+</body>
+</html>
