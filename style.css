@@ -1,1 +1,72 @@
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  font-family: sans-serif; /* Daha modern bir görünüm için */
+}
 
+/* Oyunun çizildiği canvas'ı içeren div */
+#gameCanvas {
+  border: 2px solid #000;
+  display: none; /* Başlangıçta oyun alanı gizli */
+}
+
+/* Başlangıç ekranı */
+#startScreen {
+  text-align: center;
+  padding: 20px; /* İçerik kenarlara yapışmasın */
+}
+
+#startScreen img {
+  margin: 10px;
+  width: 100px; /* Logo boyutları */
+  vertical-align: middle; /* Logoları dikeyde ortala */
+}
+
+/* Butonlar ve mesaj alanı için genel stil */
+#startButton, #restartButton, #message {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 18px;
+}
+
+/* Başlat ve Yeniden Başlat butonları özel stili */
+#startButton, #restartButton {
+  cursor: pointer;
+  background-color: #ff6200; /* Trendyol turuncusu */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /* Hover efekti için yumuşak geçiş */
+}
+
+#startButton:hover, #restartButton:hover {
+    background-color: #e65a00; /* Hover rengi */
+}
+
+/* Yeniden başlat butonu başlangıçta gizli */
+#restartButton {
+  display: none;
+}
+
+/* Hata/bilgi mesajı alanı */
+#message {
+  color: red;
+  display: none; /* Başlangıçta gizli */
+  font-weight: bold;
+}
+
+/* Başlık stili */
+h2 {
+  color: #333;
+}
+
+/* Paragraf stili */
+p {
+  color: #555;
+  line-height: 1.5; /* Satır aralığı */
+}
