@@ -17,8 +17,8 @@
 <body>
   <div id="gameCanvas"></div>
   <div id="startScreen">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pCKN8VDz8eHVrMoM-faHQj3O4HDD12bTLg&s" alt="Trendyol Logo" width="100">
-    <img src="https://placehold.co/100x100/orange/white?text=Kyrosil" alt="Kyrosil Logo" width="100">
+    <img src="images.jpg" alt="Trendyol Logo" width="100">
+    <img src="cropped-adsiz_tasarim-removebg-preview-1.png" alt="Kyrosil Logo" width="100">
     <h2>Trendyol Kargo Kapmaca</h2>
     <p>50 puana ulaş, <strong>50 TL Trendyol Hediye Çeki</strong> kazan!</p>
     <p>Günde 3 hakla oyna, 3 kargo kaçırırsan oyun biter!</p>
@@ -63,11 +63,11 @@ function updateLives() {
 
 function preload() {
   try {
-    trendyolLogo = loadImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pCKN8VDz8eHVrMoM-faHQj3O4HDD12bTLg&s');
-    kyrosilLogo = loadImage('https://placehold.co/30x30/orange/white?text=Kyrosil');
+    trendyolLogo = loadImage('images.jpg');
+    kyrosilLogo = loadImage('cropped-adsiz_tasarim-removebg-preview-1.png');
   } catch (e) {
     console.error('Logo yükleme hatası:', e);
-    trendyolLogo = null; // Yedek olarak renkli kare kullanılacak
+    trendyolLogo = null;
     kyrosilLogo = null;
   }
 }
