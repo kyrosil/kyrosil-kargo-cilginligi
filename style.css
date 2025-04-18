@@ -4,69 +4,119 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh; /* min-height kullanmak daha iyi olabilir */
   background-color: #f0f0f0;
-  font-family: sans-serif; /* Daha modern bir görünüm için */
+  font-family: sans-serif;
+  box-sizing: border-box; /* Padding hesaplamalarını kolaylaştırır */
 }
 
-/* Oyunun çizildiği canvas'ı içeren div */
 #gameCanvas {
   border: 2px solid #000;
-  display: none; /* Başlangıçta oyun alanı gizli */
+  display: none;
+  /* max-width: 100%; */ /* Canvas'ın kendisi JS ile ayarlandığı için bu genellikle işe yaramaz */
+  /* height: auto; */    /* Aynı şekilde */
 }
 
-/* Başlangıç ekranı */
 #startScreen {
   text-align: center;
-  padding: 20px; /* İçerik kenarlara yapışmasın */
+  padding: 20px;
+  max-width: 90%; /* Mobil için içeriğin taşmasını önle */
 }
 
 #startScreen img {
   margin: 10px;
-  width: 100px; /* Logo boyutları */
-  vertical-align: middle; /* Logoları dikeyde ortala */
+  width: 100px;
+  vertical-align: middle;
 }
 
-/* Butonlar ve mesaj alanı için genel stil */
 #startButton, #restartButton, #message {
   margin-top: 20px;
   padding: 12px 25px;
   font-size: 18px;
 }
 
-/* Başlat ve Yeniden Başlat butonları özel stili */
 #startButton, #restartButton {
   cursor: pointer;
-  background-color: #ff6200; /* Trendyol turuncusu */
+  background-color: #ff6200;
   color: white;
   border: none;
   border-radius: 5px;
-  transition: background-color 0.3s ease; /* Hover efekti için yumuşak geçiş */
+  transition: background-color 0.3s ease;
 }
 
 #startButton:hover, #restartButton:hover {
-    background-color: #e65a00; /* Hover rengi */
+    background-color: #e65a00;
 }
 
-/* Yeniden başlat butonu başlangıçta gizli */
 #restartButton {
   display: none;
 }
 
-/* Hata/bilgi mesajı alanı */
 #message {
   color: red;
-  display: none; /* Başlangıçta gizli */
+  display: none;
   font-weight: bold;
 }
 
-/* Başlık stili */
 h2 {
   color: #333;
+  font-size: 2em; /* Başlık boyutu */
 }
 
-/* Paragraf stili */
 p {
   color: #555;
-  line-height: 1.5; /* Satır aralığı */
+  line-height: 1.5;
+  font-size: 1em; /* Paragraf boyutu */
+}
+
+/* --- Mobil İyileştirmeleri (Media Query) --- */
+@media (max-width: 820px) { /* Geniş tablet ve altı */
+
+  body {
+     /* min-height unset yapıp normal akışa bırakılabilir veya %100 */
+     padding: 15px; /* Kenar boşlukları */
+  }
+
+  #startScreen img {
+      width: 80px; /* Logoları biraz küçült */
+  }
+
+  h2 { font-size: 1.6em; } /* Başlığı küçült */
+  p { font-size: 0.95em; } /* Paragrafları küçült */
+
+  #startButton, #restartButton {
+      font-size: 1em; /* Buton yazısını küçült */
+      padding: 10px 20px; /* Buton boyutunu küçült */
+  }
+
+  #message {
+      font-size: 0.9em; /* Mesaj yazısını küçült */
+  }
+
+  /* Canvas'ı küçültme (Basit Ölçekleme - Kalite düşebilir) */
+  /* İstersen bu kısmı açıp deneyebilirsin ama JS ile yapmak daha iyi */
+  /*
+  #gameCanvas {
+      transform: scale(0.8); // Canvas'ı %80 küçültür
+      transform-origin: top center; // Küçültme merkezini ayarla
+      margin-bottom: -120px; // scale küçültünce boşluk kalmasın diye (600 * (1-0.8) = 120)
+  }
+  */
+}
+
+@media (max-width: 480px) { /* Telefonlar */
+   h2 { font-size: 1.4em; }
+   p { font-size: 0.9em; }
+   #startButton, #restartButton { font-size: 0.9em; padding: 8px 15px; }
+   #message { font-size: 0.85em; }
+   #startScreen img { width: 60px; } /* Logoları daha da küçült */
+
+   /* Canvas için scale daha da artırılabilir */
+   /*
+   #gameCanvas {
+       transform: scale(0.6);
+       transform-origin: top center;
+       margin-bottom: -240px; // (600 * (1-0.6) = 240)
+   }
+   */
 }
