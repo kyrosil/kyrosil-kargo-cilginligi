@@ -1,6 +1,6 @@
 // --- Oyun Değişkenleri, Ayarları, Ödüller, Metinler ---
-let gleen; let kargoPool = []; const MAX_KARGOS = 60;
-let score = 0; let misses = 0;
+// ... (Diğer kısımlar aynı) ...
+let gleen; let kargoPool = []; const MAX_KARGOS = 60; let score = 0; let misses = 0;
 let giftMessage = ''; let gameOver = false; let lives = 3;
 let trendyolLogo, kyrosilLogo;
 let gameInstanceCanvas; let isVertical = false; let currentLang = 'TR';
@@ -16,79 +16,211 @@ let soundsLoadedCount = 0; const totalSounds = 6; let isBgMusicPlaying = false;
 // --- Yardımcı Fonksiyonlar ---
 function checkLives() { console.log("localStorage devre dışı. Haklar 3 olarak ayarlandı."); return 3; }
 function updateStoredLives(newLives) { lives = newLives >= 0 ? newLives : 0; }
-function updateTexts(lang) { const t = texts[lang]; if (!t) { console.error(`Metinler bulunamadı: ${lang}`); return; } try { document.getElementById('game-title').innerText = t.gameTitle; document.getElementById('rewardTitle').innerText = t.rewardTitle; document.getElementById('pointInfo').innerText = t.pointInfo; document.getElementById('howToPlay').innerText = t.howToPlay; document.getElementById('emailLabel').innerText = t.emailLabel; document.getElementById('emailInput').placeholder = t.emailPlaceholder; document.getElementById('startButton').innerText = t.startBtn; document.getElementById('restartButton').innerText = t.restartBtn; document.getElementById('emailError').innerText = t.emailError; const rewardListEl = document.getElementById('rewardList'); rewardListEl.innerHTML = ''; const currentRewardTiers = rewardTiers[lang]; currentRewardTiers.forEach(tier => { if (tier.amount) { const li = document.createElement('li'); li.innerHTML = `<strong>${tier.score} Puan:</strong> <span>${tier.amount}</span>`; rewardListEl.appendChild(li); } }); const europeNoteEl = document.getElementById('europeNote'); if (lang === 'EN' && t.europeNote) { europeNoteEl.innerText = t.europeNote; europeNoteEl.style.display = 'block'; } else { europeNoteEl.style.display = 'none'; } document.getElementById('lang-tr').classList.toggle('active', lang === 'TR'); document.getElementById('lang-en').classList.toggle('active', lang === 'EN'); document.documentElement.lang = lang.toLowerCase(); } catch (e) { console.error("updateTexts hatası:", e); }}
-function getReward(finalScore, lang) { const tiers = rewardTiers[lang]; for (const tier of tiers) { if (finalScore >= tier.score) { return tier.amount ? { amount: tier.amount, score: tier.score } : null; } } return null; }
-function isValidEmail(email) { return email && email.includes('@') && email.includes('.'); }
-function triggerConfetti() { if (typeof confetti === 'function') { console.log("Konfeti!"); confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } }); setTimeout(() => { confetti({ particleCount: 100, angle: 60, spread: 75, origin: { x: 0.1, y: 0.7 } }); confetti({ particleCount: 100, angle: 120, spread: 75, origin: { x: 0.9, y: 0.7 } }); }, 150); } else { console.warn("Konfeti kütüphanesi yüklenemedi."); } }
-function findInactiveKargo() { for (let i = 0; i < kargoPool.length; i++) { if (!kargoPool[i].active) { return kargoPool[i]; } } return null; }
-function spawnKargoFromPool(minSpeed, maxSpeed) { let kargo = findInactiveKargo(); if (kargo) { let isBonus = random(1) < 0.15; let kargoSize = isBonus ? bonusKargoBoyutu : normalKargoBoyutu; kargo.active = true; kargo.isBonus = isBonus; kargo.w = kargoSize; kargo.h = kargoSize; kargo.x = random(10, width - (kargoSize + 10)); kargo.y = -(kargoSize + 10); kargo.speed = random(minSpeed, maxSpeed); } }
-function soundLoaded() { soundsLoadedCount++; console.log("Ses yüklendi (" + soundsLoadedCount + "/" + totalSounds + ")"); if (soundsLoadedCount === totalSounds) { console.log("Tüm ses dosyaları başarıyla yüklendi!"); } }
-function soundLoadError(err) { console.error("Ses dosyası yüklenirken hata:", err); }
-function soundLoadProgress(percent) { }
-function playSound(soundFile, volume = 0.5, rate = 1, pan = 0) { if (getAudioContext().state !== 'running') {} if (soundFile && soundFile.isLoaded()) { soundFile.setVolume(volume); soundFile.rate(rate); soundFile.play(); } }
+
+// Elementin varlığını kontrol edip metin atayan yardımcı fonksiyon
+function setText(elementId, textContent) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerText = textContent;
+        // console.log(`[setText] ID: ${elementId} güncellendi.`); // İstersen logları açabilirsin
+    } else {
+        console.error(`[setText] HATA: Element bulunamadı! ID: ${elementId}`);
+    }
+}
+// Elementin varlığını kontrol edip placeholder atayan yardımcı fonksiyon
+function setPlaceholder(elementId, placeholderText) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.placeholder = placeholderText;
+        // console.log(`[setPlaceholder] ID: ${elementId} güncellendi.`);
+    } else {
+        console.error(`[setPlaceholder] HATA: Element bulunamadı! ID: ${elementId}`);
+    }
+}
+
+// Dil metinlerini güncelleyen fonksiyon (SAĞLAMLAŞTIRILDI)
+function updateTexts(lang) {
+    console.log(`[updateTexts] BAŞLADI - Dil: ${lang}`);
+    try {
+        const t = texts[lang];
+        if (!t) { throw new Error(`'${lang}' için metinler bulunamadı!`); } // Hata fırlat
+
+        // Yardımcı fonksiyonlarla metinleri ata
+        setText('game-title', t.gameTitle);
+        setText('rewardTitle', t.rewardTitle);
+        setText('pointInfo', t.pointInfo);
+        setText('howToPlay', t.howToPlay);
+        setText('emailLabel', t.emailLabel);
+        setPlaceholder('emailInput', t.emailPlaceholder); // input için placeholder
+        setText('startButton', t.startBtn);
+        setText('restartButton', t.restartBtn);
+        setText('emailError', t.emailError);
+
+        // Ödül listesini oluşturma (try-catch içinde)
+        console.log("[updateTexts] Ödül listesi oluşturuluyor...");
+        const rewardListEl = document.getElementById('rewardList');
+        if (!rewardListEl) { throw new Error("rewardList elementi bulunamadı!"); }
+        rewardListEl.innerHTML = '';
+        const currentRewardTiers = rewardTiers[lang];
+        if (!currentRewardTiers) { throw new Error(`'${lang}' için ödül baremleri bulunamadı!`); }
+
+        try {
+            currentRewardTiers.forEach((tier, index) => {
+                if (tier.amount) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${tier.score} Puan:</strong> <span>${tier.amount}</span>`;
+                    rewardListEl.appendChild(li);
+                }
+            });
+            console.log("[updateTexts] Ödül listesi başarıyla oluşturuldu.");
+        } catch (listError) {
+            console.error("[updateTexts] HATA: Ödül listesi oluşturulurken hata oluştu!", listError);
+            // Hata olsa bile devam etmeyi deneyebiliriz veya burada durabiliriz. Şimdilik devam etsin.
+        }
+
+        // Avrupa notunu göster/gizle
+        console.log("[updateTexts] Avrupa notu kontrol ediliyor...");
+        const europeNoteEl = document.getElementById('europeNote');
+        if (!europeNoteEl) { throw new Error("europeNote elementi bulunamadı!"); }
+        if (lang === 'EN' && t.europeNote) { europeNoteEl.innerText = t.europeNote; europeNoteEl.style.display = 'block'; }
+        else { europeNoteEl.style.display = 'none'; }
+        console.log("[updateTexts] Avrupa notu ayarlandı.");
+
+        // Aktif buton stilini ayarla
+        console.log("[updateTexts] Buton stilleri ayarlanıyor...");
+         const btnTR = document.getElementById('lang-tr');
+         const btnEN = document.getElementById('lang-en');
+         if (btnTR) btnTR.classList.toggle('active', lang === 'TR'); else console.error("TR Butonu bulunamadı!");
+         if (btnEN) btnEN.classList.toggle('active', lang === 'EN'); else console.error("EN Butonu bulunamadı!");
+
+        document.documentElement.lang = lang.toLowerCase();
+        console.log(`[updateTexts] BİTTİ - Dil: ${lang}`);
+
+    } catch (error) {
+        // Eğer try bloğu içinde bir hata olursa burada yakalanır ve konsola yazdırılır.
+        console.error(`[updateTexts] GENEL HATA oluştu - Dil: ${lang}`, error);
+    }
+}
+
+
+function getReward(finalScore, lang) { /* ... öncekiyle aynı ... */ }
+function isValidEmail(email) { /* ... öncekiyle aynı ... */ }
+function triggerConfetti() { /* ... öncekiyle aynı ... */ }
+function findInactiveKargo() { /* ... öncekiyle aynı ... */ }
+function spawnKargoFromPool(minSpeed, maxSpeed) { /* ... öncekiyle aynı ... */ }
+function soundLoaded() { /* ... öncekiyle aynı ... */ }
+function soundLoadError(err) { /* ... öncekiyle aynı ... */ }
+function soundLoadProgress(percent) { /* ... öncekiyle aynı ... */ }
+function playSound(soundFile, volume = 0.5, rate = 1, pan = 0) { /* ... öncekiyle aynı ... */ }
 
 // --- p5.js Özel Fonksiyonları ---
 function preload() { /* ... öncekiyle aynı ... */ }
+
 function setup() {
-    // ... (Canvas oluşturma, gleen, havuz oluşturma - öncekiyle aynı) ...
-     let canvasW, canvasH; let w = windowWidth; let h = windowHeight; if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; } else { isVertical = false; canvasW = 800; canvasH = 600; } gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas'); let gleenY = canvasH - (isVertical ? 40 : 60); gleen = { x: canvasW / 2 - playerWidth / 2, y: gleenY, w: playerWidth, h: playerHeight }; kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); }
+    console.log("[setup] Başladı...");
+    try { // Setup'ı da try-catch içine alalım
+        let canvasW, canvasH; let w = windowWidth; let h = windowHeight;
+        if (w < h && w < 600) { isVertical = true; canvasW = w * 0.95; canvasH = h * 0.80; }
+        else { isVertical = false; canvasW = 800; canvasH = 600; }
+        gameInstanceCanvas = createCanvas(canvasW, canvasH); gameInstanceCanvas.parent('gameCanvas');
+        let gleenY = canvasH - (isVertical ? 40 : 60);
+        gleen = { x: canvasW / 2 - playerWidth / 2, y: gleenY, w: playerWidth, h: playerHeight };
+        kargoPool = []; for (let i = 0; i < MAX_KARGOS; i++) { kargoPool.push({ active: false, x: 0, y: 0, w: 0, h: 0, speed: 0, isBonus: false }); }
+        lives = checkLives();
+        console.log('[setup] Kurulum Bitti Log Öncesi. Haklar:', lives);
 
-    lives = checkLives();
-    console.log('Kurulum Bitti. Mod:', isVertical ? 'Dikey' : 'Yatay', 'Boyut:', round(canvasW), 'x', round(canvasH), 'Haklar:', lives, '(localStorage DEVRE DIŞI)');
+        // Dil butonlarına event listener ekle ('click' kullanılıyor)
+        const langTRButton = document.getElementById('lang-tr');
+        const langENButton = document.getElementById('lang-en');
+        const emailInputForTouch = document.getElementById('emailInput'); // Bu artık start içinde lazım
 
-    // Dil butonlarına olay dinleyici ('click' kullanılıyor)
-    const langTRButton = document.getElementById('lang-tr');
-    const langENButton = document.getElementById('lang-en');
+        if (langTRButton) {
+            langTRButton.addEventListener('click', () => {
+                console.log("[Event] TR button CLICKED.");
+                playSound(clickSound);
+                if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); }
+            });
+            console.log("[setup] TR Buton Listener Eklendi (click).");
+        } else { console.error("[setup] TR Dil butonu bulunamadı!"); }
 
-    if (langTRButton) {
-        langTRButton.addEventListener('click', () => { // <<<--- 'click' kullanılıyor
-            console.log("[Event] TR button CLICKED.");
-            playSound(clickSound);
-            if (currentLang !== 'TR') { currentLang = 'TR'; updateTexts(currentLang); }
-        });
-         console.log("[setup] TR Buton Listener Eklendi (click).");
-    } else { console.error("[setup] TR Dil butonu bulunamadı!"); }
+        if (langENButton) {
+            langENButton.addEventListener('click', () => {
+                console.log("[Event] EN button CLICKED.");
+                playSound(clickSound);
+                if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); }
+            });
+            console.log("[setup] EN Buton Listener Eklendi (click).");
+        } else { console.error("[setup] EN Dil butonu bulunamadı!"); }
 
-    if (langENButton) {
-        langENButton.addEventListener('click', () => { // <<<--- 'click' kullanılıyor
-            console.log("[Event] EN button CLICKED.");
-            playSound(clickSound);
-            if (currentLang !== 'EN') { currentLang = 'EN'; updateTexts(currentLang); }
-        });
-         console.log("[setup] EN Buton Listener Eklendi (click).");
-     } else { console.error("[setup] EN Dil butonu bulunamadı!"); }
+        console.log("[setup] İlk updateTexts çağrılıyor...");
+        updateTexts(currentLang);
+        console.log("[setup] İlk updateTexts çağrıldıktan sonra.");
 
-    updateTexts(currentLang);
-    gameInstanceCanvas.style('pointer-events', 'auto');
-    noLoop();
-    console.log("[setup] Kurulum Tamamlandı.");
+        if(gameInstanceCanvas) gameInstanceCanvas.style('pointer-events', 'auto'); else console.error("gameInstanceCanvas bulunamadı!");
+        noLoop();
+        console.log("[setup] Kurulum Tamamlandı."); // Bu log görünmeli
+    } catch (setupError) {
+        console.error("[setup] KURULUM SIRASINDA KRİTİK HATA!", setupError);
+    }
 }
 
 function draw() { /* ... (öncekiyle aynı) ... */ }
-function startGame() { /* ... (öncekiyle aynı) ... */ }
+
+function startGame() {
+    console.log("[startGame] Fonksiyonu çağrıldı."); // İlk log
+    try { // startGame'i de try-catch içine alalım
+        playSound(clickSound); // Ses çalmayı dene
+        const emailInput = document.getElementById('emailInput');
+        const emailError = document.getElementById('emailError');
+        const startScreen = document.getElementById('startScreen');
+        const gameCanvas = document.getElementById('gameCanvas');
+        const restartButton = document.getElementById('restartButton');
+        const messageDiv = document.getElementById('message'); // message div'ini al
+
+        // Element kontrolleri
+        if (!emailInput || !emailError || !startScreen || !gameCanvas || !restartButton || !messageDiv) {
+            console.error("[startGame] Gerekli HTML elementlerinden biri veya birkaçı bulunamadı!");
+            return; // Element yoksa devam etme
+        }
+
+        const email = emailInput.value.trim();
+        console.log("[startGame] Email kontrol ediliyor:", email);
+
+        if (isValidEmail(email)) {
+            console.log("[startGame] Email geçerli.");
+            emailError.style.display = 'none';
+            lives = checkLives();
+            console.log("[startGame] Hak kontrol sonucu:", lives);
+            if (lives > 0) {
+                console.log("[startGame] Oyun başlatılıyor...");
+                startScreen.style.display = 'none';
+                gameCanvas.style.display = 'block'; // Canvas'ı göster
+                restartButton.style.display = 'none';
+                messageDiv.style.display = 'none'; // Mesaj div'ini gizle
+                resetGame();
+                if (gameInstanceCanvas) { gameInstanceCanvas.style('pointer-events', 'auto'); }
+                frameCount = 0;
+                if (bgMusic && bgMusic.isLoaded() && !isBgMusicPlaying) { bgMusic.setVolume(0.3); bgMusic.loop(); isBgMusicPlaying = true; }
+                else if (isBgMusicPlaying && bgMusic && !bgMusic.isPlaying()) { bgMusic.loop(); }
+                loop(); // Oyun döngüsünü başlat
+                console.log('[startGame] Oyun başarıyla başlatıldı.');
+            } else {
+                 console.log("[startGame] Hak bitti.");
+                 messageDiv.innerText = texts[currentLang].noMoreLives;
+                 messageDiv.style.display = 'block';
+                 // Başlat butonunu tekrar gizle veya pasif yap? Şimdilik kalsın.
+            }
+        } else {
+            console.log("[startGame] Email geçersiz.");
+            emailError.style.display = 'block';
+        }
+    } catch (startError) {
+        console.error("[startGame] HATA oluştu!", startError);
+    }
+}
+
 function restartGame() { /* ... (öncekiyle aynı) ... */ }
 function resetGame() { /* ... (öncekiyle aynı) ... */ }
-
-// --- Dokunma Fonksiyonları (ŞİMDİLİK DEVRE DIŞI) ---
-/* // <<<--- Bu fonksiyonlar komple yoruma alındı
-function touchStarted() {
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-     // console.log("Canvas içinde dokunma başladı (engellendi).");
-     return false; // Varsayılanı engelle
-  }
-   // console.log("Canvas DIŞINDA dokunma başladı (engellenmedi).");
-}
-
-function touchMoved() {
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-     // console.log("Canvas içinde parmak hareket etti (engellendi).");
-     return false; // Varsayılanı engelle (Kaydırma için en önemlisi)
-  }
-   // console.log("Canvas DIŞINDA parmak hareket etti (engellenmedi).");
-}
-
-function touchEnded() {
-    // console.log("Dokunma bitti.");
-}
-*/ // <<<--- Yorum Bitişi
-// --- DOKUNMA FONKSİYONLARI BİTTİ ---
+function touchStarted() { /* ... (Yorumda) ... */ }
+function touchMoved() { /* ... (Yorumda) ... */ }
+function touchEnded() { /* ... (Yorumda) ... */ }
