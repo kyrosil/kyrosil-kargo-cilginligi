@@ -1,55 +1,50 @@
 // --- Oyun Değişkenleri ---
-let gleen; // Oyuncunun kontrol ettiği sepet nesnesi
-let kargolar = []; // Ekranda düşen kargoları tutan dizi
-let score = 0; // Oyuncunun puanı
-let misses = 0; // Kaçırılan kargo sayısı (3 olunca oyun biter)
-let giftMessage = ''; // 50 puana ulaşınca gösterilecek mesaj
-let gameOver = false; // Oyunun bitip bitmediğini kontrol eden bayrak
-let lives = 3; // Oyuncunun günlük deneme hakkı
-let trendyolLogo, kyrosilLogo; // Logo resimleri için değişkenler
-
-// p5.js'in oluşturduğu canvas'a erişmek için değişken
+let gleen;
+let kargolar = [];
+let score = 0;
+let misses = 0;
+let giftMessage = '';
+let gameOver = false;
+let lives = 3;
+let trendyolLogo, kyrosilLogo;
 let gameInstanceCanvas;
 
 // --- Oyun Ayarları ---
 const normalKargoBoyutu = 35;
-const bonusKargoBoyutu = 45; // <<<--- İSTEK 1: Bonus kargo boyutu artırıldı
+const bonusKargoBoyutu = 55;
 
 // --- Yardımcı Fonksiyonlar ---
-
-// localStorage'dan günlük hakları kontrol etme veya sıfırlama
 function checkLives() {
   const today = new Date().toDateString();
   const storedDate = localStorage.getItem('gameDate');
   const storedLives = localStorage.getItem('lives');
+  // console.log("checkLives çalıştı. Tarih:", storedDate, "Hak:", storedLives); // LOG KALDIRILDI
 
   if (storedDate !== today || storedLives === null) {
-    console.log('Günlük haklar sıfırlandı.');
+    // console.log('Günlük haklar sıfırlandı (checkLives).'); // LOG KALDIRILDI
     localStorage.setItem('gameDate', today);
     localStorage.setItem('lives', '3');
     return 3;
   }
 
   const currentLives = parseInt(storedLives);
-  console.log('Kaydedilmiş haklar:', currentLives);
+  // console.log('Kaydedilmiş hak bulundu (checkLives):', currentLives); // LOG KALDIRILDI
   return isNaN(currentLives) || currentLives < 0 ? 3 : currentLives;
 }
 
-// Kalan hak sayısını localStorage'a kaydetme
 function updateStoredLives(newLives) {
+    // console.log("updateStoredLives çağrıldı. Önceki hak:", lives, "Yeni hak:", newLives); // LOG KALDIRILDI
     lives = newLives >= 0 ? newLives : 0;
     localStorage.setItem('lives', lives.toString());
-    console.log('localStorage güncellendi. Kalan hak:', lives);
+    // console.log('localStorage güncellendi (updateStoredLives). Kalan hak:', lives); // LOG KALDIRILDI
 }
 
 // --- p5.js Özel Fonksiyonları ---
-
-// Oyun başlamadan önce yüklenmesi gerekenler
 function preload() {
   try {
     trendyolLogo = loadImage('images.jpg');
     kyrosilLogo = loadImage('cropped-adsiz_tasarim-removebg-preview-1.png');
-    console.log('Logo resimleri yüklenmeye çalışıldı.');
+    // console.log('Logo resimleri yüklenmeye çalışıldı.'); // LOG KALDIRILDI
   } catch (e) {
     console.error('Logo yükleme hatası:', e);
     trendyolLogo = null;
@@ -57,230 +52,179 @@ function preload() {
   }
 }
 
-// Oyunun başlangıç ayarları
 function setup() {
   gameInstanceCanvas = createCanvas(800, 600);
   gameInstanceCanvas.parent('gameCanvas');
   gleen = { x: width / 2 - 25, y: height - 60, w: 50, h: 15 };
   lives = checkLives();
-  console.log('Setup: Başlangıç hakları:', lives);
+  console.log('Oyun Kurulumu Tamamlandı. Başlangıç Hakları:', lives); // Sadece başlangıç logu kalsın
   noLoop();
-  console.log('Setup tamamlandı. Oyun "Başla" butonunu bekliyor.');
 }
 
-// Oyunun her karesinde sürekli çalışan çizim ve mantık fonksiyonu
 function draw() {
   background(200, 200, 255);
 
-  // --- Oyun Bitti Durumu ---
   if (gameOver) {
+    // ... (Oyun Bitti ekranı - Değişiklik yok) ...
     fill(255, 0, 0);
     textSize(40);
     textAlign(CENTER, CENTER);
     text('Oyun Bitti! Puan: ' + score, width / 2, height / 2 - 40);
-
     if (lives > 0) {
       document.getElementById('restartButton').style.display = 'block';
-      textSize(20);
-      fill(0);
+      textSize(20); fill(0);
       text('Tekrar denemek için 1 hakkını kullan.', width / 2, height / 2 + 20);
-    }
-    else {
+    } else {
       document.getElementById('message').style.display = 'block';
       document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
       document.getElementById('restartButton').style.display = 'none';
     }
     noLoop();
-    console.log('Oyun bitti çizimi yapıldı. Puan:', score, 'Kalan Haklar:', lives);
     return;
   }
 
-  // --- Oyun Aktif Durumu ---
-
-  // Sepeti çiz
+  // Sepeti çiz ve hareket ettir
   fill(255, 102, 0);
   noStroke();
   rect(gleen.x, gleen.y, gleen.w, gleen.h, 5);
-
-  // Sepeti fare ile hareket ettir
   gleen.x = mouseX - gleen.w / 2;
   if (gleen.x < 0) gleen.x = 0;
   if (gleen.x > width - gleen.w) gleen.x = width - gleen.w;
 
+  // Zorluk Ayarları
+  let spawnRate = 50; let minSpeed = 3; let maxSpeed = 7;
+  if (score >= 30) { spawnRate = 40; minSpeed = 5; maxSpeed = 11; }
+  else if (score >= 15) { spawnRate = 45; minSpeed = 4; maxSpeed = 9; }
 
-  // --- İSTEK 2: Artan Zorluk Ayarları ---
-  let spawnRate = 50; // Varsayılan: 50 karede bir kargo
-  let minSpeed = 3;   // Varsayılan min hız
-  let maxSpeed = 7;   // Varsayılan max hız
-
-  if (score >= 30) { // 30 puan ve üzeri
-      spawnRate = 40; // Daha sık (40 karede bir)
-      minSpeed = 5;
-      maxSpeed = 11; // Daha hızlı
-      console.log("Zorluk: Seviye 3");
-  } else if (score >= 15) { // 15-29 puan arası
-      spawnRate = 45; // Biraz daha sık (45 karede bir)
-      minSpeed = 4;
-      maxSpeed = 9; // Biraz daha hızlı
-      console.log("Zorluk: Seviye 2");
-  } else {
-      // 0-14 puan: Başlangıç seviyesi (yukarıdaki varsayılanlar kullanılır)
-       console.log("Zorluk: Seviye 1");
-  }
-  // --- Zorluk Ayarları Bitişi ---
-
-
-  // Belirli aralıklarla yeni kargo ekle (dinamik spawnRate'e göre)
+  // Yeni kargo ekleme
   if (frameCount % spawnRate === 0 && lives > 0) {
-    let isBonus = random(1) < 0.15; // %15 bonus ihtimali
-
-    // <<<--- İSTEK 1: Kargo boyutunu bonus olup olmamasına göre ayarla
+    let isBonus = random(1) < 0.15;
     let kargoSize = isBonus ? bonusKargoBoyutu : normalKargoBoyutu;
-
     kargolar.push({
-      x: random(10, width - (kargoSize + 10)), // Kargo boyutuna göre x pozisyonu
-      y: -(kargoSize + 10), // Kargo boyutuna göre y pozisyonu
-      w: kargoSize, // Boyut ata
-      h: kargoSize, // Boyut ata
-      // <<<--- İSTEK 2: Hızı dinamik aralığa göre ata
-      speed: random(minSpeed, maxSpeed),
+      x: random(10, width - (kargoSize + 10)),
+      y: -(kargoSize + 10),
+      w: kargoSize, h: kargoSize,
+      speed: random(minSpeed, maxSpeed), // Bu hız artık "hedef hız" (60 FPS'teki)
       isBonus: isBonus
     });
   }
 
-  // Kargoları yönet (düşürme, çizme, çarpışma kontrolü)
+  // Kargoları yönet
   for (let i = kargolar.length - 1; i >= 0; i--) {
     let kargo = kargolar[i];
-    kargo.y += kargo.speed; // Kargoyu hareket ettir
+
+    // <<<--- HAREKETİ deltaTime İLE GÜNCELLE ---
+    // kargo.speed: Hedeflenen hız (60 FPS'te saniyede speed * 60 piksel)
+    // deltaTime: Önceki kareden geçen süre (ms)
+    // (deltaTime / 1000): Geçen sürenin saniye cinsinden değeri
+    // speed * (deltaTime / 1000) : Bu karede katetmesi gereken mesafe (saniyedeki hızına göre)
+    // Ancak kargo.speed'i piksel/kare olarak tanımladık. Bu yüzden normalizasyon yapalım:
+    // (1000 / 60) : 60 FPS'te bir karenin süresi (ms)
+    // (deltaTime / (1000 / 60)) : Gerçek kare süresinin hedeflenen kare süresine oranı
+    let speedMultiplier = deltaTime / (1000 / 60); // Hız çarpım faktörü
+    if (isNaN(speedMultiplier) || speedMultiplier > 5) {
+        speedMultiplier = 1; // Çok büyük deltaTime değerlerini veya NaN'ı engelle
+    }
+    kargo.y += kargo.speed * speedMultiplier; // Hareketi uygula
+    // --- deltaTime Güncellemesi Bitti ---
+
 
     // Kargoyu çiz
     push();
     translate(kargo.x + kargo.w / 2, kargo.y + kargo.h / 2);
     imageMode(CENTER);
-
-    // <<<--- İSTEK 1: Çizerken kargo nesnesindeki w/h kullanılır (boyut zaten ayarlandı)
-    if (kargo.isBonus && kyrosilLogo) {
-      image(kyrosilLogo, 0, 0, kargo.w, kargo.h);
-    } else if (!kargo.isBonus && trendyolLogo) {
-      image(trendyolLogo, 0, 0, kargo.w, kargo.h);
-    } else {
-      // Logo yoksa varsayılan çizim
-      rectMode(CENTER);
-      fill(kargo.isBonus ? color(255, 215, 0) : color(139, 69, 19));
-      rect(0, 0, kargo.w * 0.8, kargo.h * 0.8);
-    }
+    if (kargo.isBonus && kyrosilLogo) { image(kyrosilLogo, 0, 0, kargo.w, kargo.h); }
+    else if (!kargo.isBonus && trendyolLogo) { image(trendyolLogo, 0, 0, kargo.w, kargo.h); }
+    else { rectMode(CENTER); fill(kargo.isBonus ? color(255, 215, 0) : color(139, 69, 19)); rect(0, 0, kargo.w * 0.8, kargo.h * 0.8); }
     pop();
 
     // Çarpışma Kontrolü
-    if (
-      gleen.x < kargo.x + kargo.w &&
-      gleen.x + gleen.w > kargo.x &&
-      gleen.y < kargo.y + kargo.h &&
-      gleen.y + gleen.h > kargo.y
-    ) {
-      score += kargo.isBonus ? 5 : 1; // Puan ekle
-      kargolar.splice(i, 1); // Kargoyu sil
-      console.log('Kargo yakalandı! Puan:', score);
-
-      // Hediye çeki kontrolü
+    if ( gleen.x < kargo.x + kargo.w && gleen.x + gleen.w > kargo.x && gleen.y < kargo.y + kargo.h && gleen.y + gleen.h > kargo.y )
+    {
+      score += kargo.isBonus ? 5 : 1;
+      kargolar.splice(i, 1);
       if (score >= 50 && !giftMessage) {
         giftMessage = 'Tebrikler! 50 TL Trendyol Hediye Çeki Kazandın!';
-        console.log('Hediye çeki kazanıldı!');
-        // İPUCU: İstersen burada oyunu durdurabilirsin: noLoop();
+        console.log('Hediye çeki kazanıldı!'); // Bu log kalabilir
       }
     }
-    // Kargo ekran dışına çıktı mı?
+    // Kargo kaçırma kontrolü
     else if (kargo.y > height + kargo.h) {
-      let kacirilanKargo = kargolar.splice(i, 1)[0]; // Kargoyu sil ve al
-
-      // Sadece normal kargo kaçırılınca hak düşür
+      let kacirilanKargo = kargolar.splice(i, 1)[0];
       if (!kacirilanKargo.isBonus) {
           misses += 1;
-          console.log('Normal kargo kaçırıldı! Kaçırılan:', misses);
           if (misses >= 3) {
+            console.log('3 kargo kaçırıldı, oyun bitti.'); // Bu log kalabilir
             gameOver = true;
             updateStoredLives(lives - 1);
-            console.log('3 kargo kaçırıldı, oyun bitti. Kalan hak:', lives);
           }
-      } else {
-          console.log('Bonus kargo kaçırıldı (hak etkilenmedi).');
       }
     }
   } // Kargo döngüsü sonu
 
   // Bilgileri Ekrana Yazdır
-  fill(0);
-  textSize(20);
-  textAlign(LEFT, TOP);
+  fill(0); textSize(20); textAlign(LEFT, TOP);
   text('Puan: ' + score, 15, 20);
   text('Kaçırılan: ' + misses + '/3', 15, 50);
   text('Kalan Hak: ' + lives, 15, 80);
 
-  // Hediye mesajı varsa göster
+  // Hediye mesajı
   if (giftMessage) {
-    textAlign(CENTER, CENTER);
-    textSize(28);
-    fill(0, 150, 0);
+    textAlign(CENTER, CENTER); textSize(28); fill(0, 150, 0);
     text(giftMessage, width / 2, height / 2);
   }
 } // draw() fonksiyonu sonu
 
-
 // --- HTML Butonlarından Çağrılan Fonksiyonlar ---
-
-// Oyunu Başlatma
 function startGame() {
+  // console.log("startGame çağrıldı."); // LOG KALDIRILDI
   lives = checkLives();
+  // console.log("startGame: Hak kontrol sonucu:", lives); // LOG KALDIRILDI
   if (lives > 0) {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameCanvas').style.display = 'block';
     document.getElementById('restartButton').style.display = 'none';
     document.getElementById('message').style.display = 'none';
-
-    resetGame(); // Oyunu sıfırla
-    frameCount = 0; // Kare sayacını sıfırla (zorluk seviyesi ve ilk kargo için önemli)
-    loop(); // Oyun döngüsünü başlat
-    console.log('Oyun başlatıldı. Hak:', lives);
+    resetGame();
+    frameCount = 0;
+    loop();
+    console.log('Oyun başlatıldı.'); // Bu log kalabilir
   } else {
     document.getElementById('message').style.display = 'block';
     document.getElementById('message').innerText = 'Günlük 3 hakkın bitti! Yarın tekrar dene.';
-    console.log('Haklar bittiği için oyun başlatılamadı.');
+    // console.log('Haklar bittiği için oyun başlatılamadı (startGame).'); // LOG KALDIRILDI
   }
 }
 
-// Oyunu Yeniden Başlatma
 function restartGame() {
-  console.log("Yeniden başlat butonuna tıklandı. Mevcut hak:", lives);
+  // console.log("restartGame çağrıldı. Mevcut hak (azaltmadan önce):", lives); // LOG KALDIRILDI
   if (lives > 0) {
-     updateStoredLives(lives - 1); // Hakkı azalt ve kaydet
-
-     if (lives > 0) { // Hala hak varsa
+     updateStoredLives(lives - 1);
+     // console.log("restartGame: Hak azaltıldı. Yeni hak:", lives); // LOG KALDIRILDI
+     if (lives > 0) {
         document.getElementById('restartButton').style.display = 'none';
         document.getElementById('message').style.display = 'none';
         resetGame();
-        frameCount = 0; // Kare sayacını sıfırla
+        frameCount = 0;
         loop();
-        console.log('Oyun yeniden başlatıldı. Kalan haklar:', lives);
-     }
-     else { // Son hak kullanıldıysa
+        console.log('Oyun yeniden başlatıldı.'); // Bu log kalabilir
+     } else {
         gameOver = true;
-        console.log('Son hak kullanıldı, oyun bitti.');
-        redraw(); // Oyun bitti ekranını hemen çizdir
+        console.log('Son hak kullanıldı, oyun bitti.'); // Bu log kalabilir
+        redraw();
      }
   } else {
-      console.log('Hata: Hak yokken yeniden başlatmaya çalışıldı.');
+      // console.log('Hata: Hak yokken yeniden başlatmaya çalışıldı (restartGame).'); // LOG KALDIRILDI
       document.getElementById('restartButton').style.display = 'none';
   }
 }
 
-// Oyun değişkenlerini sıfırlayan fonksiyon
 function resetGame() {
     score = 0;
     misses = 0;
     kargolar = [];
     giftMessage = '';
     gameOver = false;
-    gleen.x = width / 2 - gleen.w / 2; // Sepeti ortaya al
-    // misses = 0; zaten yukarıda yapılıyor.
-    console.log("Oyun değişkenleri sıfırlandı.");
+    gleen.x = width / 2 - gleen.w / 2;
+    // console.log("Oyun değişkenleri sıfırlandı (resetGame)."); // LOG KALDIRILDI
 }
